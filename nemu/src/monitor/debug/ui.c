@@ -42,6 +42,48 @@ static int cmd_si(char *args) {
     cpu_exec(n);
     return 0;
 }
+
+static int cmd_info(char *args) {
+    char command;
+    sscanf(args,"%c",&command);
+    if(command == 'r'){
+        //print the rigisters
+        printf("eax\t0x%0x\t%d\n",cpu.eax,cpu.eax);
+        printf("ecx\t0x%0x\t%d\n",cpu.eax,cpu.ecx);
+        printf("edx\t0x%0x\t%d\n",cpu.eax,cpu.edx);
+        printf("ebx\t0x%0x\t%d\n",cpu.eax,cpu.ebx);
+        printf("esp\t0x%0x\t%d\n",cpu.eax,cpu.esp);
+        printf("ebp\t0x%0x\t%d\n",cpu.eax,cpu.ebp);
+        printf("esi\t0x%0x\t%d\n",cpu.eax,cpu.esi);
+        printf("edi\t0x%0x\t%d\n",cpu.eax,cpu.edi);
+
+        printf("ax\t0x%0x\t%d\n",reg_w(0),reg_w(0));
+        printf("cx\t0x%0x\t%d\n",reg_w(1),reg_w(1));
+        printf("dx\t0x%0x\t%d\n",reg_w(2),reg_w(2));
+        printf("bx\t0x%0x\t%d\n",reg_w(3),reg_w(3));
+        printf("sp\t0x%0x\t%d\n",reg_w(4),reg_w(4));
+        printf("bp\t0x%0x\t%d\n",reg_w(5),reg_w(5));
+        printf("si\t0x%0x\t%d\n",reg_w(6),reg_w(6));
+        printf("di\t0x%0x\t%d\n",reg_w(7),reg_w(7));
+
+        printf("ah\t0x%0x\t%d\n",reg_b(0),reg_b(0));
+        printf("ch\t0x%0x\t%d\n",reg_b(1),reg_b(1));
+        printf("dh\t0x%0x\t%d\n",reg_b(2),reg_b(2));
+        printf("bh\t0x%0x\t%d\n",reg_b(3),reg_b(3));
+        printf("sh\t0x%0x\t%d\n",reg_b(4),reg_b(4));
+        printf("bh\t0x%0x\t%d\n",reg_b(5),reg_b(5));
+        printf("sh\t0x%0x\t%d\n",reg_b(6),reg_b(6));
+        printf("dh\t0x%0x\t%d\n",reg_b(7),reg_b(7));
+
+        printf("eip\t0x%0x\t%d\n",cpu.eip,cpu.eip);
+    }else if(command == 'w'){
+        //打印监视点信息
+    }else{
+        printf("Unknown command: info %c\n",command);
+    }
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -53,6 +95,7 @@ static struct {
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
     { "si", "si [N] top the program after N instructions.(N : default 1)" , cmd_si },
+    //{ "info", "info r : print out the register",cmd_info }
 	/* TODO: Add more commands */
 
 };
