@@ -95,7 +95,7 @@ static struct {
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
     { "si", "si [N] top the program after N instructions.(N : default 1)" , cmd_si },
-    //{ "info", "info r : print out the register",cmd_info }
+    { "info", "info r : print out the register",cmd_info }
 	/* TODO: Add more commands */
 
 };
