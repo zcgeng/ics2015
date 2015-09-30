@@ -90,9 +90,14 @@ static int cmd_x(char* args){
     sscanf(args,"%d %x",&n,&address);
     int i;
     for(i = 0;i < n; ++i){
-        uint32_t memory = hwaddr_read(address, 32);
-        printf("0x%x :\t%08x\n",address,memory);
-        address += 4;
+        printf("%x:\t",address);
+        int j;
+        for(j = 0;j < 4; ++j){
+            uint32_t memory = hwaddr_read(address, 8);
+            printf("%02x ",memory);
+            address += 1;
+        }
+        printf("\n");
     }
     return 0;
 }
