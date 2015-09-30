@@ -85,7 +85,7 @@ static int cmd_info(char *args) {
 }
 
 static int cmd_x(char* args){
-    //扫描内存 unfinished!!
+    //扫描内存 
     int n,address;
     sscanf(args,"%d %x",&n,&address);
     int i;
