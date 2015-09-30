@@ -91,7 +91,8 @@ static int cmd_x(char* args){
     int i;
     for(i = 0;i < n; ++i){
         uint32_t memory = hwaddr_read(address, 32);
-        printf("%x :\t%x\n",address,memory);
+        printf("0x%x :\t%x\n",address,memory);
+        address += 4;
     }
     return 0;
 }
