@@ -93,7 +93,7 @@ static int cmd_x(char* args){
         printf("%x:\t",address);
         int j;
         for(j = 0;j < 4; ++j){
-            uint32_t memory = hwaddr_read(address, 8);
+            uint8_t memory = hwaddr_read(address, 8);
             printf("%02x ",memory);
             address += 1;
         }
