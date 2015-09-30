@@ -86,11 +86,12 @@ static int cmd_info(char *args) {
 
 static int cmd_x(char* args){
     //扫描内存 unfinished!!
-    int n,*p;
-    sscanf(args,"%d %p",&n,&p);
+    int n,address;
+    sscanf(args,"%d %x",&n,&address);
     int i;
     for(i = 0;i < n; ++i){
-        printf("%p:\t%x\n",p,*p);
+        uint32_t memory = hwaddr_read(address, 32);
+        printf("%x :\t%x\n",address,memory);
     }
     return 0;
 }
