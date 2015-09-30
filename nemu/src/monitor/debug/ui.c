@@ -77,13 +77,23 @@ static int cmd_info(char *args) {
 
         printf("eip\t0x%0x\t%d\n",cpu.eip,cpu.eip);
     }else if(command == 'w'){
-        //打印监视点信息
+        //TODO:打印监视点信息
     }else{
         printf("Unknown command: info %c\n",command);
     }
     return 0;
 }
 
+static int cmd_x(char* args){
+    //扫描内存 unfinished!!
+    int n,*p;
+    sscanf(args,"%d %p",&n,&p);
+    int i;
+    for(i = 0;i < n; ++i){
+        printf("%p:\t%x\n",p,*p);
+    }
+    return 0;
+}
 static int cmd_help(char *args);
 
 static struct {
@@ -95,7 +105,8 @@ static struct {
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
     { "si", "si [N] top the program after N instructions.(N : default 1)" , cmd_si },
-    { "info", "info r : print out the register",cmd_info }
+    { "info", "info r : print out the register",cmd_info },
+    { "x", "x N EXPR : Calculate the EXPR and print the RAM of the next N DWORDs from the result of EXPR",cmd_x },
 	/* TODO: Add more commands */
 
 };
