@@ -38,14 +38,26 @@ static int cmd_q(char *args) {
 
 static int cmd_si(char *args) {
     int n = 1;
-    if (args != NULL) sscanf(args,"%d",&n);
+    if (args != NULL){
+        if(sscanf(args,"%d",&n) != 1){
+            printf("wrong argument\n");
+            return 0;
+        }
+    } 
     cpu_exec(n);
     return 0;
 }
 
 static int cmd_info(char *args) {
     char command;
-    sscanf(args,"%c",&command);
+    if(args == NULL){
+        printf("please input arguments\n");
+        return 0;
+    }
+    if(sscanf(args,"%c",&command) != 1){
+        printf("wrong argument\n");
+        return 0;
+    }
     if(command == 'r'){
         //print the rigisters
         printf("eax\t0x%0x\t%d\n",cpu.eax,cpu.eax);
@@ -87,7 +99,15 @@ static int cmd_info(char *args) {
 static int cmd_x(char* args){
     //扫描内存 
     int n,address;
-    sscanf(args,"%d %x",&n,&address);
+    if(args == NULL){
+        printf("plese input arguments\ntype 'help' to get more informations\n");
+        return 0;
+    }
+    if(sscanf(args,"%d %x",&n,&address) != 2){
+        printf("wrong arguments\n");
+        return 0;
+    }
+    
     int i;
     for(i = 0;i < n; ++i){
         printf("%x:\t",address);
