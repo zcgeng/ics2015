@@ -60,32 +60,16 @@ static int cmd_info(char *args) {
     }
     if(command == 'r'){
         //print the rigisters
-        printf("eax\t0x%0x\t%d\n",cpu.eax,cpu.eax);
-        printf("ecx\t0x%0x\t%d\n",cpu.eax,cpu.ecx);
-        printf("edx\t0x%0x\t%d\n",cpu.eax,cpu.edx);
-        printf("ebx\t0x%0x\t%d\n",cpu.eax,cpu.ebx);
-        printf("esp\t0x%0x\t%d\n",cpu.eax,cpu.esp);
-        printf("ebp\t0x%0x\t%d\n",cpu.eax,cpu.ebp);
-        printf("esi\t0x%0x\t%d\n",cpu.eax,cpu.esi);
-        printf("edi\t0x%0x\t%d\n",cpu.eax,cpu.edi);
-
-        printf("ax\t0x%0x\t%d\n",reg_w(0),reg_w(0));
-        printf("cx\t0x%0x\t%d\n",reg_w(1),reg_w(1));
-        printf("dx\t0x%0x\t%d\n",reg_w(2),reg_w(2));
-        printf("bx\t0x%0x\t%d\n",reg_w(3),reg_w(3));
-        printf("sp\t0x%0x\t%d\n",reg_w(4),reg_w(4));
-        printf("bp\t0x%0x\t%d\n",reg_w(5),reg_w(5));
-        printf("si\t0x%0x\t%d\n",reg_w(6),reg_w(6));
-        printf("di\t0x%0x\t%d\n",reg_w(7),reg_w(7));
-
-        printf("ah\t0x%0x\t%d\n",reg_b(0),reg_b(0));
-        printf("ch\t0x%0x\t%d\n",reg_b(1),reg_b(1));
-        printf("dh\t0x%0x\t%d\n",reg_b(2),reg_b(2));
-        printf("bh\t0x%0x\t%d\n",reg_b(3),reg_b(3));
-        printf("sh\t0x%0x\t%d\n",reg_b(4),reg_b(4));
-        printf("bh\t0x%0x\t%d\n",reg_b(5),reg_b(5));
-        printf("sh\t0x%0x\t%d\n",reg_b(6),reg_b(6));
-        printf("dh\t0x%0x\t%d\n",reg_b(7),reg_b(7));
+        int i = 0;
+        for(i = 0;i < 8; ++i){
+            printf("%s\t0x%x\t\t%u\n",regsl[i],reg_l(i),reg_l(i));
+        }
+        for(i = 0;i < 8; ++i){
+            printf("%s\t0x%x\t\t%u\n",regsw[i],reg_w(i),reg_w(i));
+        }
+        for(i = 0;i < 8; ++i){
+            printf("%s\t0x%x\t\t%u\n",regsb[i],reg_b(i),reg_b(i));
+        }
 
         printf("eip\t0x%0x\t%d\n",cpu.eip,cpu.eip);
     }else if(command == 'w'){
