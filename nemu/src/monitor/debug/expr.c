@@ -84,8 +84,24 @@ static bool make_token(char *e) {
 				 * types of tokens, some extra actions should be performed.
 				 */
 
+                tokens[nr_token].type = rules[i].token_type;
 				switch(rules[i].token_type) {
-					default: panic("please implement me");
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '(':
+                case ')':
+                    break;
+                case NUM:
+                    if(substr_len > 32) Assert(0,"input too long number!\n");
+                    strncpy(tokens[nr_token].str, substr_start, substr_len);
+                    tokens[nr_token].str[31] = '\0';
+                    break;
+                case NOTYPE:
+                    nr_token--;
+                    break;
+                default: panic("please implement me");
 				}
 
 				break;
