@@ -116,7 +116,37 @@ static bool make_token(char *e) {
 
 	return true; 
 }
+eval(p,	q){
+    if(p>q){
+        /*Bad expression*/
+    }
+    else if(p == q){	
+        /*Single token.
+         * For now this token should be a number.	
+         * Return the value of the number.
+         */	
+    }
+    else if(check_parentheses(p, q) == true) {
+        /* The expression is surrounded by a matched pair of parentheses.	
+         * If that is the case, just throw away the parentheses.
+         */
+        return eval(p + 1, q - 1);	
+    }
+    else{
+        op = the position of dominant operator in the token expression;
+        val1=eval(p, op- 1);
+        val2 = eval(op + 1, q);	
 
+        switch(op_type) {
+            case '+': return val1 + val2;
+            case '-': /* ... */
+            case '*': /* ... */
+            case '/': /* ... */
+            default: assert(0);
+        }
+    }
+}
+实现算术表达式的递归求值
 uint32_t expr(char *e, bool *success) {
 	if(!make_token(e)) {
 		*success = false;
@@ -124,6 +154,7 @@ uint32_t expr(char *e, bool *success) {
 	}
 
 	/* TODO: Insert codes to evaluate the expression. */
+    return eval(0,nr_token);
 	panic("please implement me");
 	return 0;
 }
