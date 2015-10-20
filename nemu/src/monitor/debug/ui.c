@@ -105,6 +105,12 @@ static int cmd_x(char* args){
     }
     return 0;
 }
+static int cmd_p(char *args){
+    bool success;
+    expr(args, &success);
+    if(success)
+        printf("function expr exit successfully\n");
+}
 static int cmd_help(char *args);
 
 static struct {
@@ -118,6 +124,7 @@ static struct {
     { "si", "si [N] top the program after N instructions.(N : default 1)" , cmd_si },
     { "info", "info r : print out the register",cmd_info },
     { "x", "x N EXPR : Calculate the EXPR and print the RAM of the next N DWORDs from the result of EXPR",cmd_x },
+    { "p", "p EXPR : Calculate the EXPR and print the result out.",cmd_p }
 	/* TODO: Add more commands */
 
 };
