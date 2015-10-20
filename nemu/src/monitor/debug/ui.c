@@ -110,6 +110,7 @@ static int cmd_p(char *args){
     expr(args, &success);
     if(success)
         printf("function expr exit successfully\n");
+    return 0;
 }
 static int cmd_help(char *args);
 
