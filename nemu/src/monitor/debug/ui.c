@@ -107,9 +107,11 @@ static int cmd_x(char* args){
 }
 static int cmd_p(char *args){
     bool success;
-    expr(args, &success);
-    if(success)
-        printf("function expr exit successfully\n");
+    int ans = expr(args, &success);
+    if(!success)
+        printf("There is an error occured in function expr()\n");
+    else 
+        printf(" : %d\n",ans);
     return 0;
 }
 static int cmd_help(char *args);

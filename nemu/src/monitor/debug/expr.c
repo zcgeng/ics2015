@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ, NUM
+	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM
     
 	/* TODO: Add more token types */
 
@@ -16,21 +16,31 @@ enum {
 static struct rule {
 	char *regex;
 	int token_type;
+    int precedence; // 优先级,无意义时值为99
+    bool associate; // 结合性:从左向右结合为1,从右向左为0
 } rules[] = {
 
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
 
-	{" +",	NOTYPE},				// spaces
-	{"\\+", '+'},					// plus
-	{"==", EQ},			    		// equal
-    {"-", '-'},                     // sub
-    {"\\*", '*'},                   // mul
-    {"/", '/'},                     // dev
-    {"\\(", '('},                   // left bracket
-    {"\\)", ')'},                   // right bracket
-    {"[0-9]", NUM}                       // numbers
+	{" +",	NOTYPE, 99, 0},				// spaces
+	{"\\+", '+', 13, 1},					// plus
+	{"==", EQ, 10, 1},			    		// equal
+    {"!=", NEQ, 10, 1},
+    {"-", '-', 13, 1},                     // sub
+    {"\\*", '*', 14, 1},                   // mul
+    {"/", '/', 14, 1},                     // dev
+    {"\\(", '(', 15, 1},                   // left bracket
+    {"\\)", ')', 15, 1},                   // right bracket
+    {"%", '%', 14, 1},                      // mod
+    {"<<", SHL, 12, 1},                     // shift left
+    {">>", SHR, 12, 1},                     // shift right
+    {">=", GE, 11, 1},
+    {"<=", LE, 11, 1},
+    {">", '>', 11, 1},
+    {"<", '<', 11, 1},
+    {"[0-9]", NUM, 99, 0}                       // numbers
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -56,6 +66,8 @@ void init_regex() {
 
 typedef struct token {
 	int type;
+    int precedence;
+    bool associate;
 	char str[32];
 } Token;
 
@@ -85,6 +97,8 @@ static bool make_token(char *e) {
 				 */
 
                 tokens[nr_token].type = rules[i].token_type;
+                tokens[nr_token].associate = rules[i].associate;
+                tokens[nr_token].precedence = rules[i].precedence;
 				switch(rules[i].token_type) {
                 case '+':
                 case '-':
@@ -92,6 +106,15 @@ static bool make_token(char *e) {
                 case '/':
                 case '(':
                 case ')':
+                case '%':
+                case '>':
+                case '<':
+                case EQ:
+                case NEQ:
+                case SHL:
+                case SHR:
+                case GE:
+                case LE:
                     break;
                 case NUM:
                     if(substr_len > 32) Assert(0,"input too long number!\n");
@@ -101,8 +124,9 @@ static bool make_token(char *e) {
                 case NOTYPE:
                     nr_token--;
                     break;
-                default: panic("please implement me");
+                default: panic("can not recognize the token type : %c\n",token_type);
 				}
+                nr_token++;
 
 				break;
 			}
@@ -117,24 +141,9 @@ static bool make_token(char *e) {
 	return true; 
 }
 bool check_parentheses(int p, int q){
-    // 检验括号是否合法
+    // 只检验是否被一对括号包围
     int count = 0;
     bool flag = true;
-    for(int i = p; i <= q; ++i){
-        char tmp = tokens[i].str[0];
-        if( tmp == '(' )
-            count++;
-        else if( tmp == ')' )
-            count--;
-        if (count < 0) 
-            flag = false;
-    }
-    if(count) flag = false;
-    if(!flag){
-        printf("表达式括号不匹配!\n");
-        return 0;
-    }
-    // 检验是否被一对括号包围
     if(tokens[p].str[0] != '(' || tokens[q].str[0] != ')')
         return false;
     for(count = 0, int i = p+1; i <= q-1; ++i){
@@ -146,14 +155,17 @@ bool check_parentheses(int p, int q){
         if (count < 0) 
             flag = false;
     }
+    if(count != 0) flag = false;
     if(flag)
         return true;
     else
         return false;
 }
-eval(p,	q){
+eval(int p, int q, bool *success){
     if(p>q){
-        Assert(0,"Bad expression\n");
+        printf("Bad expression\n");
+        *success = false;
+        return 0;
         /*Bad expression*/
     }
     else if(p == q){	
@@ -178,22 +190,57 @@ eval(p,	q){
         return eval(p + 1, q - 1);	
     }
     else{
-        int op;
+        bool par_err = false; 
+        int op = p;
         int count = 0;
         for(int i = p; i <= q; ++i){
             if(tokens[i].str[0] == '(') count++;
-            if(tokens[i].str[0] == ')') count--;
-
+            else if(tokens[i].str[0] == ')') count--;
+            else if(count == 0){
+                if(tokens[i].precedence < tokens[op].precedence)
+                    op = i; // 找到最低优先级
+                if(tokens[i].precedence == tokens[op].precedence && tokens[i].associate == 1)
+                    op = i; // 找到最后结合的 
+            }
+            if(count < 0) par_err = true;
         }
+        if(count != 0) par_err = true;
+        if(par_err){
+            printf("parentheses error!\n");
+            *success = false;
+            return 1;
+        }
+        
         int val1 = eval(p, op- 1);
         int val2 = eval(op + 1, q);	
-
+        int op_type = tokens[op].type;
         switch(op_type) {
             case '+': return val1 + val2;
             case '-': return val1 - val2;
             case '*': return val1 * val2;
-            case '/': return val1 / val2;
-            default: assert(0);
+            case '/': 
+                if(val2==0){
+                    printf("Error! divided by 0\n");
+                    *success = false;
+                    return 1;
+                }
+                else return val1/val2;
+            case '%':
+                if(val2==0){
+                    printf("Error! mod by 0\n");
+                    *success = false;
+                    return 1;
+                }
+                else return val1 % val2;
+            case EQ : return val1 == val2;
+            case NEQ : return val1 != val2;
+            case '>' : return val1 > val2;
+            case '<' : return val1 < val2;
+            case SHL : return val1 << val2;
+            case SHR : return val1 >> val2;
+            case GE : return val1 >= val2;
+            case LE : return val1 <= val2;
+            default: Assert(0,"op_type : didn't find %c\n",op_type);
         }
     }
 }
@@ -204,8 +251,8 @@ uint32_t expr(char *e, bool *success) {
 	}
 
 	/* TODO: Insert codes to evaluate the expression. */
-    return eval(0,nr_token);
-	panic("please implement me");
+    return eval(0,nr_token-1,success);
+	//panic("please implement me");
 	return 0;
 }
 
