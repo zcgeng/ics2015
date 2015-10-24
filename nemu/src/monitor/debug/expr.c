@@ -116,8 +116,44 @@ static bool make_token(char *e) {
 
 	return true; 
 }
+bool check_parentheses(int p, int q){
+    // 检验括号是否合法
+    int count = 0;
+    bool flag = true;
+    for(int i = p; i <= q; ++i){
+        char tmp = tokens[i].str[0];
+        if( tmp == '(' )
+            count++;
+        else if( tmp == ')' )
+            count--;
+        if (count < 0) 
+            flag = false;
+    }
+    if(count) flag = false;
+    if(!flag){
+        printf("表达式括号不匹配!\n");
+        return 0;
+    }
+    // 检验是否被一对括号包围
+    if(tokens[p].str[0] != '(' || tokens[q].str[0] != ')')
+        return false;
+    for(count = 0, int i = p+1; i <= q-1; ++i){
+        char tmp = tokens[i].str[0];
+        if( tmp == '(' )
+            count++;
+        else if( tmp == ')' )
+            count--;
+        if (count < 0) 
+            flag = false;
+    }
+    if(flag)
+        return true;
+    else
+        return false;
+}
 eval(p,	q){
     if(p>q){
+        Assert(0,"Bad expression\n");
         /*Bad expression*/
     }
     else if(p == q){	
@@ -125,6 +161,15 @@ eval(p,	q){
          * For now this token should be a number.	
          * Return the value of the number.
          */	
+        if(tokens[p].type == NUM){
+            int number = 0;
+            char *tmp = tokens[p].str;
+            while(*tmp){
+                number = num * 10 + *tmp - '0';
+                tmp++;
+            }
+            return number;
+        }
     }
     else if(check_parentheses(p, q) == true) {
         /* The expression is surrounded by a matched pair of parentheses.	
@@ -133,20 +178,25 @@ eval(p,	q){
         return eval(p + 1, q - 1);	
     }
     else{
-        op = the position of dominant operator in the token expression;
-        val1=eval(p, op- 1);
-        val2 = eval(op + 1, q);	
+        int op;
+        int count = 0;
+        for(int i = p; i <= q; ++i){
+            if(tokens[i].str[0] == '(') count++;
+            if(tokens[i].str[0] == ')') count--;
+
+        }
+        int val1 = eval(p, op- 1);
+        int val2 = eval(op + 1, q);	
 
         switch(op_type) {
             case '+': return val1 + val2;
-            case '-': /* ... */
-            case '*': /* ... */
-            case '/': /* ... */
+            case '-': return val1 - val2;
+            case '*': return val1 * val2;
+            case '/': return val1 / val2;
             default: assert(0);
         }
     }
 }
-实现算术表达式的递归求值
 uint32_t expr(char *e, bool *success) {
 	if(!make_token(e)) {
 		*success = false;
