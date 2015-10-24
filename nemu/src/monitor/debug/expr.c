@@ -40,7 +40,7 @@ static struct rule {
     {"<=", LE, 11, 1},
     {">", '>', 11, 1},
     {"<", '<', 11, 1},
-    {"[0-9]", NUM, 99, 0}                       // numbers
+    {"[0-9]+", NUM, 99, 0}                       // numbers
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -88,7 +88,7 @@ static bool make_token(char *e) {
 				char *substr_start = e + position;
 				int substr_len = pmatch.rm_eo;
 
-				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
+				//Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
 
 				/* TODO: Now a new token is recognized with rules[i]. Add codes
@@ -119,12 +119,13 @@ static bool make_token(char *e) {
                 case NUM:
                     if(substr_len > 32) Assert(0,"input too long number!\n");
                     strncpy(tokens[nr_token].str, substr_start, substr_len);
-                    tokens[nr_token].str[31] = '\0';
+                    tokens[nr_token].str[substr_len] = '\0';
                     break;
                 case NOTYPE:
                     nr_token--;
                     break;
-                default: panic("can not recognize the token type : %c\n",token_type);
+                default: printf("can not recognize the token type : %d\n",rules[i].token_type);
+                         return false;
 				}
                 nr_token++;
 
@@ -144,10 +145,11 @@ bool check_parentheses(int p, int q){
     // 只检验是否被一对括号包围
     int count = 0;
     bool flag = true;
-    if(tokens[p].str[0] != '(' || tokens[q].str[0] != ')')
+    if(tokens[p].type != '(' || tokens[q].type != ')')
         return false;
-    for(count = 0, int i = p+1; i <= q-1; ++i){
-        char tmp = tokens[i].str[0];
+    int i;
+    for(count = 0, i = p+1; i <= q-1; ++i){
+        int tmp = tokens[i].type;
         if( tmp == '(' )
             count++;
         else if( tmp == ')' )
@@ -156,14 +158,11 @@ bool check_parentheses(int p, int q){
             flag = false;
     }
     if(count != 0) flag = false;
-    if(flag)
-        return true;
-    else
-        return false;
+    return flag;
 }
-eval(int p, int q, bool *success){
+int eval(int p, int q, bool *success){
     if(p>q){
-        printf("Bad expression\n");
+        printf("Bad expression : p > q\n");
         *success = false;
         return 0;
         /*Bad expression*/
@@ -177,7 +176,7 @@ eval(int p, int q, bool *success){
             int number = 0;
             char *tmp = tokens[p].str;
             while(*tmp){
-                number = num * 10 + *tmp - '0';
+                number = number * 10 + *tmp - '0';
                 tmp++;
             }
             return number;
@@ -187,15 +186,16 @@ eval(int p, int q, bool *success){
         /* The expression is surrounded by a matched pair of parentheses.	
          * If that is the case, just throw away the parentheses.
          */
-        return eval(p + 1, q - 1);	
+        return eval(p + 1, q - 1,success);	
     }
     else{
         bool par_err = false; 
         int op = p;
         int count = 0;
-        for(int i = p; i <= q; ++i){
-            if(tokens[i].str[0] == '(') count++;
-            else if(tokens[i].str[0] == ')') count--;
+        int i = 0;
+        for(i = p; i <= q; ++i){
+            if(tokens[i].type == '(') count++;
+            else if(tokens[i].type == ')') count--;
             else if(count == 0){
                 if(tokens[i].precedence < tokens[op].precedence)
                     op = i; // 找到最低优先级
@@ -211,8 +211,8 @@ eval(int p, int q, bool *success){
             return 1;
         }
         
-        int val1 = eval(p, op- 1);
-        int val2 = eval(op + 1, q);	
+        int val1 = eval(p, op- 1,success);
+        int val2 = eval(op + 1, q,success);	
         int op_type = tokens[op].type;
         switch(op_type) {
             case '+': return val1 + val2;
@@ -240,9 +240,13 @@ eval(int p, int q, bool *success){
             case SHR : return val1 >> val2;
             case GE : return val1 >= val2;
             case LE : return val1 <= val2;
-            default: Assert(0,"op_type : didn't find %c\n",op_type);
+            default: printf("op_type : didn't find %d\n",op_type);
+                    *success = false;
+                    return 1;
         }
     }
+    *success = false;
+    return 1;
 }
 uint32_t expr(char *e, bool *success) {
 	if(!make_token(e)) {
@@ -251,6 +255,7 @@ uint32_t expr(char *e, bool *success) {
 	}
 
 	/* TODO: Insert codes to evaluate the expression. */
+    *success = true;
     return eval(0,nr_token-1,success);
 	//panic("please implement me");
 	return 0;
