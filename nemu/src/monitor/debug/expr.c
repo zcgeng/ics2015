@@ -41,7 +41,7 @@ static struct rule {
     {">", '>', 10, 1},
     {"<", '<', 10, 1},
     {"[0-9]+", NUM, 99, 0},                       // numbers
-    {"-", MINUS, 14, 0},                    // 取负
+    {"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
     {"*", DEREF, 14, 0}                     // 取值
 };
 
@@ -213,14 +213,20 @@ int eval(int p, int q, bool *success){
             return 1;
         }
         
-        int val1 = eval(p, op- 1,success);
-        int val2 = eval(op + 1, q,success);	
         int op_type = tokens[op].type;
+        int val1 = 0, val2 = 0;
+        if(op_type == MINUS || op_type == DEREF){
+            val1 = eval(op+1, q, success);
+        }
+        else{
+            val1 = eval(p, op- 1,success);
+            val2 = eval(op + 1, q,success);	
+        }
         switch(op_type) {
             case '+': return val1 + val2;
             case '-': return val1 - val2;
-            case MINUS: return -val2;
-            case DEREF: return 0; // TODO
+            case MINUS: return -val1;
+            case DEREF: return swaddr_read(val1,4); // TODO
             case '*': return val1 * val2;
             case '/': 
                 if(val2==0){
@@ -261,10 +267,16 @@ uint32_t expr(char *e, bool *success) {
 	/* TODO: Insert codes to evaluate the expression. */
     int i = 0;
     for(i = 0; i < nr_token; i++){
-        if(tokens[i].type == '-' && (i == 0 || tokens[i-1].type != NUM))
-            tokens[i].type = MINUS;// 只有'-'前面是数字时,它才是减号
-        if(tokens[i].type == '*' && (i == 0 || tokens[i-1].type != NUM))
+        if(tokens[i].type == '-' && (i == 0 || tokens[i-1].type != NUM)){
+            tokens[i].type = MINUS;
+            tokens[i].precedence = 14;
+            tokens[i].associate = 0;
+        }
+        if(tokens[i].type == '*' && (i == 0 || tokens[i-1].type != NUM)){
             tokens[i].type = DEREF;
+            tokens[i].precedence = 14;
+            tokens[i].associate = 0;
+        }
     }
     *success = true;
     return eval(0,nr_token-1,success);
