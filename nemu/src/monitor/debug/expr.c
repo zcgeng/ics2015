@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, NUM16
+	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, AND, OR, NUM16
     
 	/* TODO: Add more token types */
 
@@ -28,6 +28,8 @@ static struct rule {
 	{"\\+", '+', 12, 1},					// plus
 	{"==", EQ, 10, 1},			    		// equal
     {"!=", NEQ, 10, 1},
+    {"&&", AND, 5, 1},
+    {"\\|\\|", OR, 4, 1},
     {"-", '-', 12, 1},                     // sub
     {"\\*", '*', 13, 1},                   // mul
     {"/", '/', 13, 1},                     // dev
@@ -40,6 +42,7 @@ static struct rule {
     {"<=", LE, 10, 1},
     {">", '>', 10, 1},
     {"<", '<', 10, 1},
+    {"\\!", '!', 14, 0},
     {"0x[0-9a-fA-F]+", NUM16, 99, 0},
     {"[0-9]+", NUM, 99, 0},                       // numbers
     {"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
@@ -112,6 +115,9 @@ static bool make_token(char *e) {
                 case '%':
                 case '>':
                 case '<':
+                case '!':
+                case AND:
+                case OR:
                 case EQ:
                 case NEQ:
                 case SHL:
@@ -240,7 +246,7 @@ int eval(int p, int q, bool *success){
         
         int op_type = tokens[op].type;
         int val1 = 0, val2 = 0;
-        if(op_type == MINUS || op_type == DEREF){
+        if(op_type == MINUS || op_type == DEREF || op_type == '!'){
             val1 = eval(op+1, q, success);
         }
         else{
@@ -250,8 +256,6 @@ int eval(int p, int q, bool *success){
         switch(op_type) {
             case '+': return val1 + val2;
             case '-': return val1 - val2;
-            case MINUS: return -val1;
-            case DEREF: return swaddr_read(val1,4);
             case '*': return val1 * val2;
             case '/': 
                 if(val2==0){
@@ -267,6 +271,11 @@ int eval(int p, int q, bool *success){
                     return 1;
                 }
                 else return val1 % val2;
+            case MINUS: return -val1;
+            case DEREF: return swaddr_read(val1,4);
+            case '!' : return !val1;
+            case AND : return val1 && val2;
+            case OR : return val1 || val2;
             case EQ : return val1 == val2;
             case NEQ : return val1 != val2;
             case '>' : return val1 > val2;
