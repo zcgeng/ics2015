@@ -111,7 +111,7 @@ static int cmd_p(char *args){
     if(!success)
         printf("There is an error occured in function expr()\n");
     else 
-        printf(" : %d\n",ans);
+        printf(" : %d\n\t(0x%x)",ans,ans);
     return 0;
 }
 static int cmd_help(char *args);
