@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, AND, OR, NUM16
+	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, AND, OR, NUM16, REG
     
 	/* TODO: Add more token types */
 
@@ -43,6 +43,7 @@ static struct rule {
     {">", '>', 10, 1},
     {"<", '<', 10, 1},
     {"\\!", '!', 14, 0},
+    {"\\$[a-zA-Z]+",REG, 99, 0},                  // registers
     {"0x[0-9a-fA-F]+", NUM16, 99, 0},
     {"[0-9]+", NUM, 99, 0},                       // numbers
     {"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
@@ -125,6 +126,7 @@ static bool make_token(char *e) {
                 case GE:
                 case LE:
                     break;
+                case REG:
                 case NUM:
                 case NUM16:
                     if(substr_len > 31){
@@ -214,6 +216,27 @@ int eval(int p, int q, bool *success){
             }
             return number;
         }
+        else if(tokens[p].type == REG){
+            char *reg = tokens[p].str + 1;
+            // 调用读取寄存器
+            //Log("reg = %s\n",reg);
+            int i = 0;
+            if(strcmp(reg, "eip") == 0){
+                return cpu.eip;
+            }
+            for(i = 0; i < 8; ++i)
+                if(strcmp(regsl[i], reg) == 0)
+                    return reg_l(i);
+            for(i = 0; i < 8; ++i)
+                if(strcmp(regsw[i], reg) == 0)
+                    return reg_w(i);
+            for(i = 0; i < 8; ++i)
+                if(strcmp(regsb[i], reg) == 0)
+                    return reg_b(i);
+            printf("didn't find register : %s\n", tokens[p].str);
+            *success = false;
+            return 1;
+        }
     }
     else if(check_parentheses(p, q) == true) {
         /* The expression is surrounded by a matched pair of parentheses.	
@@ -301,12 +324,12 @@ uint32_t expr(char *e, bool *success) {
 	/* TODO: Insert codes to evaluate the expression. */
     int i = 0;
     for(i = 0; i < nr_token; i++){
-        if(tokens[i].type == '-' && (i == 0 || tokens[i-1].type != NUM)){
+        if(tokens[i].type == '-' && (i == 0 || (tokens[i-1].type != NUM && tokens[i-1].type != REG))){
             tokens[i].type = MINUS;
             tokens[i].precedence = 14;
             tokens[i].associate = 0;
         }
-        if(tokens[i].type == '*' && (i == 0 || tokens[i-1].type != NUM)){
+        if(tokens[i].type == '*' && (i == 0 || (tokens[i-1].type != NUM && tokens[i-1].type != REG))){
             tokens[i].type = DEREF;
             tokens[i].precedence = 14;
             tokens[i].associate = 0;
