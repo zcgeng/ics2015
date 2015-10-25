@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF
+	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, NUM16
     
 	/* TODO: Add more token types */
 
@@ -40,6 +40,7 @@ static struct rule {
     {"<=", LE, 10, 1},
     {">", '>', 10, 1},
     {"<", '<', 10, 1},
+    {"0x[0-9a-fA-F]+", NUM16, 99, 0},
     {"[0-9]+", NUM, 99, 0},                       // numbers
     {"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
     {"*", DEREF, 14, 0}                     // 取值
@@ -119,7 +120,11 @@ static bool make_token(char *e) {
                 case LE:
                     break;
                 case NUM:
-                    if(substr_len > 31) Assert(0,"input too long number!\n");
+                case NUM16:
+                    if(substr_len > 31){
+                        printf("input too long number!\n");
+                        return false;
+                    }
                     strncpy(tokens[nr_token].str, substr_start, substr_len);
                     tokens[nr_token].str[substr_len] = '\0';
                     break;
@@ -183,6 +188,26 @@ int eval(int p, int q, bool *success){
             }
             return number;
         }
+        else if(tokens[p].type == NUM16){
+            int number = 0;
+            char *tmp = tokens[p].str + 2;
+            while(*tmp){
+                number = number * 16;
+                if(*tmp >= '0' && *tmp <= '9')
+                    number += *tmp - '0';
+                else if(*tmp >= 'a' && *tmp <= 'f')
+                    number += *tmp - 'a' + 10;
+                else if(*tmp >= 'A' && *tmp <= 'F')
+                    number += *tmp - 'A' + 10;
+                else{
+                    printf("Error occured when recognizing NUM16\n");
+                    *success = false;
+                    return 1;
+                }
+                tmp++;
+            }
+            return number;
+        }
     }
     else if(check_parentheses(p, q) == true) {
         /* The expression is surrounded by a matched pair of parentheses.	
@@ -226,7 +251,7 @@ int eval(int p, int q, bool *success){
             case '+': return val1 + val2;
             case '-': return val1 - val2;
             case MINUS: return -val1;
-            case DEREF: return swaddr_read(val1,4); // TODO
+            case DEREF: return swaddr_read(val1,4);
             case '*': return val1 * val2;
             case '/': 
                 if(val2==0){
