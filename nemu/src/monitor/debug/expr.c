@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM
+	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF
     
 	/* TODO: Add more token types */
 
@@ -25,22 +25,24 @@ static struct rule {
 	 */
 
 	{" +",	NOTYPE, 99, 0},				// spaces
-	{"\\+", '+', 13, 1},					// plus
+	{"\\+", '+', 12, 1},					// plus
 	{"==", EQ, 10, 1},			    		// equal
     {"!=", NEQ, 10, 1},
-    {"-", '-', 13, 1},                     // sub
-    {"\\*", '*', 14, 1},                   // mul
-    {"/", '/', 14, 1},                     // dev
+    {"-", '-', 12, 1},                     // sub
+    {"\\*", '*', 13, 1},                   // mul
+    {"/", '/', 13, 1},                     // dev
     {"\\(", '(', 15, 1},                   // left bracket
     {"\\)", ')', 15, 1},                   // right bracket
-    {"%", '%', 14, 1},                      // mod
-    {"<<", SHL, 12, 1},                     // shift left
-    {">>", SHR, 12, 1},                     // shift right
-    {">=", GE, 11, 1},
-    {"<=", LE, 11, 1},
-    {">", '>', 11, 1},
-    {"<", '<', 11, 1},
-    {"[0-9]+", NUM, 99, 0}                       // numbers
+    {"%", '%', 13, 1},                      // mod
+    {"<<", SHL, 11, 1},                     // shift left
+    {">>", SHR, 11, 1},                     // shift right
+    {">=", GE, 10, 1},
+    {"<=", LE, 10, 1},
+    {">", '>', 10, 1},
+    {"<", '<', 10, 1},
+    {"[0-9]+", NUM, 99, 0},                       // numbers
+    {"-", MINUS, 14, 0},                    // 取负
+    {"*", DEREF, 14, 0}                     // 取值
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -117,7 +119,7 @@ static bool make_token(char *e) {
                 case LE:
                     break;
                 case NUM:
-                    if(substr_len > 32) Assert(0,"input too long number!\n");
+                    if(substr_len > 31) Assert(0,"input too long number!\n");
                     strncpy(tokens[nr_token].str, substr_start, substr_len);
                     tokens[nr_token].str[substr_len] = '\0';
                     break;
@@ -217,6 +219,8 @@ int eval(int p, int q, bool *success){
         switch(op_type) {
             case '+': return val1 + val2;
             case '-': return val1 - val2;
+            case MINUS: return -val2;
+            case DEREF: return 0; // TODO
             case '*': return val1 * val2;
             case '/': 
                 if(val2==0){
@@ -255,6 +259,13 @@ uint32_t expr(char *e, bool *success) {
 	}
 
 	/* TODO: Insert codes to evaluate the expression. */
+    int i = 0;
+    for(i = 0; i < nr_token; i++){
+        if(tokens[i].type == '-' && (i == 0 || tokens[i-1].type != NUM))
+            tokens[i].type = MINUS;// 只有'-'前面是数字时,它才是减号
+        if(tokens[i].type == '*' && (i == 0 || tokens[i-1].type != NUM))
+            tokens[i].type = DEREF;
+    }
     *success = true;
     return eval(0,nr_token-1,success);
 	//panic("please implement me");
