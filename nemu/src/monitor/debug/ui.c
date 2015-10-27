@@ -84,7 +84,7 @@ static int cmd_x(char* args){
     //扫描内存 
     int n,address;
     if(args == NULL){
-        printf("plese input arguments\ntype 'help' to get more informations\n");
+        printf("please input arguments\ntype 'help' to get more informations\n");
         return 0;
     }
     if(sscanf(args,"%d %x",&n,&address) != 2){
@@ -106,6 +106,10 @@ static int cmd_x(char* args){
     return 0;
 }
 static int cmd_p(char *args){
+    if(args == NULL){
+        printf("Please input an expression!\n");
+        return 0;
+    }
     bool success;
     int ans = expr(args, &success);
     if(!success)

@@ -322,6 +322,11 @@ int eval(int p, int q, bool *success){
     return 1;
 }
 uint32_t expr(char *e, bool *success) {
+    if( strlen(e) > 31 ){
+        *success = false;
+        printf("Too long expression!\n");
+        return 0;
+    }
 	if(!make_token(e)) {
 		*success = false;
 		return 0;
