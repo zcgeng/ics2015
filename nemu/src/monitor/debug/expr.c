@@ -46,8 +46,8 @@ static struct rule {
     {"\\$[a-zA-Z]+",REG, 99, 0},                  // registers
     {"0x[0-9a-fA-F]+", NUM16, 99, 0},
     {"[0-9]+", NUM, 99, 0},                       // numbers
-    {"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
-    {"*", DEREF, 14, 0}                     // 取值
+    //{"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
+    //{"*", DEREF, 14, 0}                     // 取值
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -179,7 +179,7 @@ int eval(int p, int q, bool *success){
     if(p>q){
         printf("Bad expression : p > q\n");
         *success = false;
-        return 0;
+        return 1;
         /*Bad expression*/
     }
     else if(p == q){	
@@ -217,8 +217,14 @@ int eval(int p, int q, bool *success){
             return number;
         }
         else if(tokens[p].type == REG){
-            char *reg = tokens[p].str + 1;
+            char *reg = tokens[p].str;
+            if( strlen(reg) <= 2 ){
+                printf("Wrong register name! %s\n",reg);
+                *success = false;
+                return 1;
+            }
             // 调用读取寄存器
+            reg ++;
             //Log("reg = %s\n",reg);
             int i = 0;
             if(strcmp(reg, "eip") == 0){
