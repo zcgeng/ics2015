@@ -76,7 +76,8 @@ void print_wp(){
         return;
     }
     printf("watchpoints:\nNO\tEXPR\t\tVALUE\n");
-    for(int i = 0; i < 32; ++i){
+    int i = 0;
+    for(i = 0; i < 32; ++i){
         WP* wp = head;
         while( wp && wp->NO != i )
             wp = wp->next;
