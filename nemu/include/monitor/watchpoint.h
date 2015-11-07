@@ -15,4 +15,5 @@ typedef struct watchpoint {
 void new_wp(char*);
 void check_wp();
 void free_wp(int number);
+void print_wp();
 #endif

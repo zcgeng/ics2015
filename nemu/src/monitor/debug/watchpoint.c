@@ -63,13 +63,25 @@ void check_wp(int* nemu_state){
         int value = expr(wp->s_expr, &success);
         if( value != wp->last_value ){
             *nemu_state = 0;
-            printf("%8x    hit watchpoint %d : the value of the ( %s ) changed from %d to %d\n", cpu.eip, wp->NO,wp->s_expr, wp->last_value, value);
+            printf("%8x    hit watchpoint %d : the value of the ( %s ) changed from 0x%x to 0x%x\n", cpu.eip, wp->NO,wp->s_expr, wp->last_value, value);
             wp -> last_value = value;
         }
         wp = wp -> next;
     }
 }
 
-void print_wp(int op){
-    //todo
+void print_wp(){
+    if( head == NULL ){
+        printf("There is no watchpoint!\n");
+        return;
+    }
+    printf("watchpoints:\nNO\tEXPR\t\tVALUE\n");
+    for(int i = 0; i < 32; ++i){
+        WP* wp = head;
+        while( wp && wp->NO != i )
+            wp = wp->next;
+        if(wp)
+            printf("%d\t%s\t0x%x\t\n", wp->NO, wp->s_expr, wp->last_value);
+    }
+    return;
 }

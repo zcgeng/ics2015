@@ -73,7 +73,8 @@ static int cmd_info(char *args) {
 
         printf("eip\t0x%0x\t%d\n",cpu.eip,cpu.eip);
     }else if(command == 'w'){
-        //TODO:打印监视点信息
+        //DONE:打印监视点信息
+        print_wp();
     }else{
         printf("Unknown command: info %c\n",command);
     }
