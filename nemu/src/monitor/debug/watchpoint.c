@@ -21,3 +21,38 @@ void init_wp_list() {
 /* TODO: Implement the functionality of watchpoint */
 
 
+void new_wp(char* args){
+    if( free == NULL ) assert(0);
+    WP* tmp = free_;
+    tmp -> s_expr = args;
+    bool success;
+    tmp -> last_value = expr(args, &success);
+    if( succsee == false ){
+        printf("Failed to create a new watchpoint(bad expression)\n");
+        return;
+    }
+    free_ = free_ -> next;
+    tmp -> next = head;
+    head = tmp;
+    return tmp;
+}
+
+void free_wp(int number){
+    WP* tmp = head;
+    WP* last = head;
+    while(tmp){
+        if( tmp -> NO == number)
+            break;
+        tmp = tmp -> next;
+        last = tmp;
+    }
+    if( tmp == NULL ){
+        printf("didn't find watchpoint number : %d\n", number);
+        return;
+    }
+    last -> next = tmp -> next;
+    tmp -> next = free_;
+    free_ = tmp;
+    return;
+}
+
