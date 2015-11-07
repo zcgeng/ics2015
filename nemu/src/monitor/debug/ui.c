@@ -118,6 +118,16 @@ static int cmd_p(char *args){
         printf(" : %d\t(0x%x)\n",ans,ans);
     return 0;
 }
+
+extern void new_wp(char *);
+static int cmd_w(char *args){
+    if(args == NULL){
+        printf("Please input an expression!\n");
+        return 0;
+    }
+    new_wp(args);
+    return 0;
+}
 static int cmd_help(char *args);
 
 static struct {
@@ -131,7 +141,8 @@ static struct {
     { "si", "si [N] top the program after N instructions.(N : default 1)" , cmd_si },
     { "info", "info r : print out the register",cmd_info },
     { "x", "x N EXPR : Calculate the EXPR and print the RAM of the next N DWORDs from the result of EXPR",cmd_x },
-    { "p", "p EXPR : Calculate the EXPR and print the result out.",cmd_p }
+    { "p", "p EXPR : Calculate the EXPR and print the result out.",cmd_p },
+    { "w", "w EXPR : create a watchpoint of an expression, when the value changed, the program will stop.", cmd_w }
 	/* TODO: Add more commands */
 
 };
