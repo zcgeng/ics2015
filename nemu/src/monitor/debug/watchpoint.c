@@ -24,7 +24,7 @@ void init_wp_list() {
 void new_wp(char* args){
     if( free_ == NULL ) assert(0);
     WP* tmp = free_;
-    tmp->s_expr = args;
+    strcpy(tmp->s_expr, args);
     bool success;
     tmp->last_value = expr(args, &success);
     if( success == false ){
