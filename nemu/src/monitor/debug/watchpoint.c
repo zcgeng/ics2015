@@ -43,8 +43,8 @@ void free_wp(int number){
     while(tmp){
         if( tmp -> NO == number)
             break;
-        tmp = tmp -> next;
         last = tmp;
+        tmp = tmp -> next;
     }
     if( tmp == NULL ){
         printf("didn't find watchpoint number : %d\n", number);

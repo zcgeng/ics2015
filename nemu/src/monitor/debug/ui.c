@@ -141,6 +141,7 @@ static int cmd_d(char *args){
     }
     if( num < 0 || num >= 32 ){
         printf("n must be smaller than 32 and no smaller than 0\n");
+        return 0;
     }
     free_wp(num);
     return 0;
