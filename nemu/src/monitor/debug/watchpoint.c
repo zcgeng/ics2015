@@ -53,6 +53,7 @@ void free_wp(int number){
     last -> next = tmp -> next;
     tmp -> next = free_;
     free_ = tmp;
+    printf("watchpoint %d deleted\n", number);
     return;
 }
 

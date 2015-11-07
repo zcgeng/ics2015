@@ -128,6 +128,24 @@ static int cmd_w(char *args){
     new_wp(args);
     return 0;
 }
+
+static int cmd_d(char *args){
+    if(args == NULL){
+        printf("Please input a number!\n");
+        return 0;
+    }
+    int num;
+    if( sscanf(args, "%d", &num) == 0 ){
+        printf("Not a number!\n");
+        return 0;
+    }
+    if( num < 0 || num >= 32 ){
+        printf("n must be smaller than 32 and no smaller than 0\n");
+    }
+    free_wp(num);
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -142,7 +160,8 @@ static struct {
     { "info", "info r : print out the register",cmd_info },
     { "x", "x N EXPR : Calculate the EXPR and print the RAM of the next N DWORDs from the result of EXPR",cmd_x },
     { "p", "p EXPR : Calculate the EXPR and print the result out.",cmd_p },
-    { "w", "w EXPR : create a watchpoint of an expression, when the value changed, the program will stop.", cmd_w }
+    { "w", "w EXPR : create a watchpoint of an expression, when the value changed, the program will stop.", cmd_w },
+    { "d", "d NO : delete the watchpoint which has number NO.", cmd_d }
 	/* TODO: Add more commands */
 
 };
