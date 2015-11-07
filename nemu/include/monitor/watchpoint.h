@@ -2,6 +2,7 @@
 #define __WATCHPOINT_H__
 
 #include "common.h"
+#include "cpu/reg.h"
 
 typedef struct watchpoint {
 	int NO;
@@ -11,4 +12,7 @@ typedef struct watchpoint {
 	/* TODO: Add more members if necessary */
 } WP;
 
+void new_wp(char*);
+void check_wp();
+void free_wp(int number);
 #endif

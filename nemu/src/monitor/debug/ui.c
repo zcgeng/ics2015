@@ -119,7 +119,6 @@ static int cmd_p(char *args){
     return 0;
 }
 
-extern void new_wp(char *);
 static int cmd_w(char *args){
     if(args == NULL){
         printf("Please input an expression!\n");
