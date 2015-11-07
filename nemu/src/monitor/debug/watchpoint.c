@@ -22,19 +22,19 @@ void init_wp_list() {
 
 
 void new_wp(char* args){
-    if( free == NULL ) assert(0);
+    if( free_ == NULL ) assert(0);
     WP* tmp = free_;
-    tmp -> s_expr = args;
+    tmp->s_expr = args;
     bool success;
-    tmp -> last_value = expr(args, &success);
-    if( succsee == false ){
+    tmp->last_value = expr(args, &success);
+    if( success == false ){
         printf("Failed to create a new watchpoint(bad expression)\n");
         return;
     }
     free_ = free_ -> next;
     tmp -> next = head;
     head = tmp;
-    return tmp;
+    return;
 }
 
 void free_wp(int number){
@@ -56,15 +56,15 @@ void free_wp(int number){
     return;
 }
 
-void check_wp(*int nemu_state){
+void check_wp(int* nemu_state){
     WP* wp = head;
     while( wp ){
         bool success;
         int value = expr(wp->s_expr, &success);
         if( value != wp->last_value ){
-            ans = wp -> NO;
-            *nemu_state = STOP;
-            printf("hit watchpoint %d : the value of the ( %s ) changed from %d to %d\n", number,wp->s_expr, last_value, value);
+            *nemu_state = 0;
+            printf("hit watchpoint %d : the value of the ( %s ) changed from %d to %d\n", wp->NO,wp->s_expr, wp->last_value, value);
+            wp -> last_value = value;
         }
         wp = wp -> next;
     }
