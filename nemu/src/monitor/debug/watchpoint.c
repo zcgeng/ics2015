@@ -56,3 +56,20 @@ void free_wp(int number){
     return;
 }
 
+void check_wp(*int nemu_state){
+    WP* wp = head;
+    while( wp ){
+        bool success;
+        int value = expr(wp->s_expr, &success);
+        if( value != wp->last_value ){
+            ans = wp -> NO;
+            *nemu_state = STOP;
+            printf("hit watchpoint %d : the value of the ( %s ) changed from %d to %d\n", number,wp->s_expr, last_value, value);
+        }
+        wp = wp -> next;
+    }
+}
+
+void print_wp(int op){
+    //todo
+}
