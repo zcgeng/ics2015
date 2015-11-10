@@ -21,3 +21,69 @@ void init_wp_list() {
 /* TODO: Implement the functionality of watchpoint */
 
 
+void new_wp(char* args){
+    if( free_ == NULL ) assert(0);
+    WP* tmp = free_;
+    strcpy(tmp->s_expr, args);
+    bool success;
+    tmp->last_value = expr(args, &success);
+    if( success == false ){
+        printf("Failed to create a new watchpoint(bad expression)\n");
+        return;
+    }
+    free_ = free_ -> next;
+    tmp -> next = head;
+    head = tmp;
+    return;
+}
+
+void free_wp(int number){
+    WP* tmp = head;
+    WP* last = head;
+    while(tmp){
+        if( tmp -> NO == number)
+            break;
+        last = tmp;
+        tmp = tmp -> next;
+    }
+    if( tmp == NULL ){
+        printf("didn't find watchpoint number : %d\n", number);
+        return;
+    }
+    last -> next = tmp -> next;
+    tmp -> next = free_;
+    free_ = tmp;
+    printf("watchpoint %d deleted\n", number);
+    return;
+}
+
+void check_wp(int* nemu_state){
+    WP* wp = head;
+    while( wp ){
+        bool success;
+        int value = expr(wp->s_expr, &success);
+        if( value != wp->last_value ){
+            *nemu_state = 0;
+            printf("%8x    hit watchpoint %d : the value of the ( %s ) changed from 0x%x to 0x%x\n", cpu.eip, wp->NO,wp->s_expr, wp->last_value, value);
+            wp -> last_value = value;
+        }
+        wp = wp -> next;
+    }
+}
+
+void print_wp(){
+    if( head == NULL ){
+        printf("There is no watchpoint!\n");
+        return;
+    }
+    printf("watchpoints:\nNO\tEXPR\t\tVALUE\n");
+    int i = 0;
+    for(i = 0; i < 32; ++i){
+        WP* wp = head;
+        while( wp && wp->NO != i )
+            wp = wp->next;
+        if(wp)
+            printf("%d\t%s\t0x%x\t\n", wp->NO, wp->s_expr, wp->last_value);
+    }
+    return;
+}
