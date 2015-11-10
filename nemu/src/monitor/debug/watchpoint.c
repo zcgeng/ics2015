@@ -50,7 +50,10 @@ void free_wp(int number){
         printf("didn't find watchpoint number : %d\n", number);
         return;
     }
-    last -> next = tmp -> next;
+    if( tmp == head ) 
+        head = tmp -> next;
+    else
+        last -> next = tmp -> next;
     tmp -> next = free_;
     free_ = tmp;
     printf("watchpoint %d deleted\n", number);
