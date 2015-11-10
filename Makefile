@@ -52,6 +52,10 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
+count :
+	find . -name "*.[hc]"|xargs cat|grep -v ^$$|wc -l 
+	@echo "lines without empty lines"
+
 USERPROG := obj/testcase/mov
 ENTRY := $(USERPROG)
 
