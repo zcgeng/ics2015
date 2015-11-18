@@ -8,7 +8,7 @@ static void do_execute() {
 	shift = ~shift;
 	cpu.eip &= shift;//eip(& 0xffffffff) or ip(& 0x0000ffff)
 	cpu.esp -= 4;
-	swaddr_write(cpu.esp, 4, cpu.eip + DATA_BYTE * 8);// PUSH 返回地址
+	swaddr_write(cpu.esp, 4, cpu.eip + DATA_BYTE);// PUSH 返回地址
 	if(op_src->type == OP_TYPE_IMM) 
 		cpu.eip += op_src->val;
 	else 
