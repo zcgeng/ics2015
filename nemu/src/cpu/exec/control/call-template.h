@@ -13,7 +13,8 @@ static void do_execute() {
 		cpu.eip += op_src->val;
 	else 
 		cpu.eip = op_src->val & shift;	
-	print_asm_template1();
+    print_asm("call $0x%x", cpu.eip);
+	//print_asm_template1();
 }
 
 
