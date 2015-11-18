@@ -71,9 +71,17 @@ static int cmd_info(char *args) {
             printf("%s\t0x%x\t\t%u\n",regsb[i],reg_b(i),reg_b(i));
         }
 
-        printf("eip\t0x%0x\t%d\n",cpu.eip,cpu.eip);
+        printf("eip\t0x%x\t%d\n",cpu.eip,cpu.eip);
+        printf("eflags\t0x%x\t%d\n",cpu.eflags, cpu.eflags);
+        printf("CF\t%x\n",cpu.CF);
+        printf("PF\t%x\n",cpu.PF);
+        printf("ZF\t%x\n",cpu.ZF);
+        printf("SF\t%x\n",cpu.SF);
+        printf("IF\t%x\n",cpu.IF);
+        printf("DF\t%x\n",cpu.DF);
+        printf("OF\t%x\n",cpu.OF);
     }else if(command == 'w'){
-        //DONE:打印监视点信息
+        //打印监视点信息
         print_wp();
     }else{
         printf("Unknown command: info %c\n",command);

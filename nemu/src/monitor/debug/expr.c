@@ -227,17 +227,38 @@ int eval(int p, int q, bool *success){
             reg ++;
             //Log("reg = %s\n",reg);
             int i = 0;
-            if(strcmp(reg, "eip") == 0){
+            if(strcasecmp(reg, "eip") == 0){
                 return cpu.eip;
             }
+            if(strcasecmp(reg, "cf") == 0){
+                return cpu.CF;
+            }
+            if(strcasecmp(reg, "pf") == 0){
+                return cpu.PF;
+            }
+            if(strcasecmp(reg, "zf") == 0){
+                return cpu.ZF;
+            }
+            if(strcasecmp(reg, "sf") == 0){
+                return cpu.SF;
+            }
+            if(strcasecmp(reg, "if") == 0){
+                return cpu.IF;
+            }
+            if(strcasecmp(reg, "df") == 0){
+                return cpu.DF;
+            }
+            if(strcasecmp(reg, "of") == 0){
+                return cpu.OF;
+            }
             for(i = 0; i < 8; ++i)
-                if(strcmp(regsl[i], reg) == 0)
+                if(strcasecmp(regsl[i], reg) == 0)
                     return reg_l(i);
             for(i = 0; i < 8; ++i)
-                if(strcmp(regsw[i], reg) == 0)
+                if(strcasecmp(regsw[i], reg) == 0)
                     return reg_w(i);
             for(i = 0; i < 8; ++i)
-                if(strcmp(regsb[i], reg) == 0)
+                if(strcasecmp(regsb[i], reg) == 0)
                     return reg_b(i);
             printf("didn't find register : %s\n", tokens[p].str);
             *success = false;
@@ -332,7 +353,7 @@ uint32_t expr(char *e, bool *success) {
 		return 0;
 	}
 
-	/* TODO: Insert codes to evaluate the expression. */
+	/* DONE: Insert codes to evaluate the expression. */
     int i = 0;
     for(i = 0; i < nr_token; i++){
         if(tokens[i].type == '-' && (i == 0 || (tokens[i-1].type != NUM && tokens[i-1].type != REG))){
