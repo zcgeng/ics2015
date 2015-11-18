@@ -72,7 +72,7 @@ static int cmd_info(char *args) {
         }
 
         printf("eip\t0x%x\t%d\n",cpu.eip,cpu.eip);
-        printf("eflags\t0x%x\t%d\n",cpu.eflags, cpu.eflags);
+        printf("eflags\t0x%8x\t%d\n",cpu.eflags, cpu.eflags);
         printf("CF\t%x\n",cpu.CF);
         printf("PF\t%x\n",cpu.PF);
         printf("ZF\t%x\n",cpu.ZF);

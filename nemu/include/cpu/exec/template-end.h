@@ -11,3 +11,4 @@
 #undef OPERAND_W
 
 #undef MSB
+#undef update_EFLAGS_PZS
