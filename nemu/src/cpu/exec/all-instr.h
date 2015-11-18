@@ -13,6 +13,8 @@
 #include "arith/cmp.h"
 #include "arith/sub.h"
 
+#include "control/call.h"
+
 #include "logic/and.h"
 #include "logic/or.h"
 #include "logic/not.h"
