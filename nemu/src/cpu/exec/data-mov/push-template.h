@@ -6,7 +6,7 @@ static void do_execute() {
 	int len;
 	len = (DATA_BYTE == 2 ? 2 : 4);
 	cpu.esp -= len;
-	swaddr_write(cpu.eip, DATA_BYTE, op_src->val);
+	swaddr_write(cpu.esp, DATA_BYTE, op_src->val);
 	print_asm_template1();
 }
 
