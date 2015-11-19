@@ -18,6 +18,7 @@
 
 #include "logic/and.h"
 #include "logic/or.h"
+#include "logic/test.h"
 #include "logic/not.h"
 #include "logic/xor.h"
 #include "logic/sar.h"
