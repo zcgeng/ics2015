@@ -16,6 +16,7 @@
 #include "arith/sub.h"
 
 #include "control/call.h"
+#include "control/leave.h"
 #include "control/jcc.h"
 #include "control/jmp.h"
 
