@@ -155,6 +155,29 @@ static int cmd_d(char *args){
     return 0;
 }
 
+bool get_fun(uint32_t, char*);
+static int cmd_bt(char *args){
+    if(args != NULL)
+        printf("(there is no need to input any arguments)\n");
+    uint32_t tmp = cpu.ebp;
+    uint32_t addr = cpu.eip;
+    char name[32];
+    int i = 0, j;
+    while(get_fun(addr, name)){
+        name[31] = '\0';
+        printf("#%02d  %08x in %s(",i++, addr, name);
+        if(strcmp("main", name) == 0){
+            printf(")\n");
+            break;
+        }
+        for(j = 2; j < 6; ++j) printf("%d, ", swaddr_read(tmp + j*4, 4));
+        printf("%d)\n", swaddr_read(tmp + j * 4, 4));
+        addr = swaddr_read(tmp + 4, 4);
+        tmp = swaddr_read(tmp, 4);
+    }
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -165,12 +188,13 @@ static struct {
 	{ "help", "Display informations about all supported commands", cmd_help },
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
-    { "si", "si [N] top the program after N instructions.(N : default 1)" , cmd_si },
-    { "info", "info r : print out the register",cmd_info },
+    { "si", "si [N] stop the program after N instructions.(N : default 1)" , cmd_si },
+    { "info", "info r : print out the register\ninfo w : print out the watch points",cmd_info },
     { "x", "x N EXPR : Calculate the EXPR and print the RAM of the next N DWORDs from the result of EXPR",cmd_x },
     { "p", "p EXPR : Calculate the EXPR and print the result out.",cmd_p },
     { "w", "w EXPR : create a watchpoint of an expression, when the value changed, the program will stop.", cmd_w },
-    { "d", "d NO : delete the watchpoint which has number NO.", cmd_d }
+    { "d", "d NO : delete the watchpoint which has number NO.", cmd_d },
+    { "bt", "print backtrace of all stack frames.", cmd_bt }
 	/* TODO: Add more commands */
 
 };
