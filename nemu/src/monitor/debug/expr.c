@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, AND, OR, NUM16, REG
+	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, AND, OR, NUM16, REG, VAR
     
 	/* TODO: Add more token types */
 
@@ -46,10 +46,10 @@ static struct rule {
     {"\\$[a-zA-Z]+",REG, 99, 0},                  // registers
     {"0x[0-9a-fA-F]+", NUM16, 99, 0},
     {"[0-9]+", NUM, 99, 0},                       // numbers
+    {"[a-zA-Z_]+[a-zA-Z0-9_]*", VAR, 99, 0},      //variables
     //{"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
     //{"*", DEREF, 14, 0}                     // 取值
-};
-
+}; 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
 
 static regex_t re[NR_REGEX];
@@ -98,7 +98,7 @@ static bool make_token(char *e) {
 				//Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
 
-				/* TODO: Now a new token is recognized with rules[i]. Add codes
+				/* DONE: Now a new token is recognized with rules[i]. Add codes
 				 * to record the token in the array ``tokens''. For certain 
 				 * types of tokens, some extra actions should be performed.
 				 */
@@ -128,6 +128,7 @@ static bool make_token(char *e) {
                     break;
                 case REG:
                 case NUM:
+                case VAR:
                 case NUM16:
                     if(substr_len > 31){
                         printf("input too long number!\n");
@@ -175,6 +176,9 @@ bool check_parentheses(int p, int q){
     if(count != 0) flag = false;
     return flag;
 }
+
+int get_var(char*);//用于查找变量
+
 int eval(int p, int q, bool *success){
     if(p>q){
         printf("Bad expression : p > q\n");
@@ -263,6 +267,16 @@ int eval(int p, int q, bool *success){
             printf("didn't find register : %s\n", tokens[p].str);
             *success = false;
             return 1;
+        }
+        else if(tokens[p].type == VAR){
+            //look it up in the symtab
+            int result = get_var(tokens[p].str);
+            if(result == -1){
+                *success = false;
+                printf("didn't find variable : %s\n", tokens[p].str);
+                return 1;
+            }
+            else return result;
         }
     }
     else if(check_parentheses(p, q) == true) {
