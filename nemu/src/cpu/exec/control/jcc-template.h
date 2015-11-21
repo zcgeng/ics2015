@@ -176,7 +176,7 @@ make_instr_helper(i)
 #define instr jle
 
 static void do_execute() {
-	if(cpu.ZF == 1 && cpu.SF != cpu.OF) {update_eip();}
+	if(cpu.ZF == 1 || cpu.SF != cpu.OF) {update_eip();}
 	print_asm("jle $0x%x", cpu.eip + CODE_LEN);
 }
 
@@ -187,7 +187,7 @@ make_instr_helper(i)
 #define instr jg
 
 static void do_execute() {
-	if(cpu.ZF == 0 || cpu.SF == cpu.OF) {update_eip();}
+	if(cpu.ZF == 0 && cpu.SF == cpu.OF) {update_eip();}
 	print_asm("jg $0x%x", cpu.eip + CODE_LEN);
 }
 
