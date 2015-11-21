@@ -166,12 +166,13 @@ static int cmd_bt(char *args){
     while(get_fun(addr, name)){
         name[31] = '\0';
         printf("#%02d  %08x in %s(",i++, addr, name);
-        if(strcmp("main", name) == 0){
-            printf(")\n");
-            break;
+        for(j = 2; j < 6; ++j){
+            if(tmp + j * 4 > 0 && tmp + j * 4 < 0x8000000)
+                printf("%d, ", swaddr_read(tmp + j*4, 4));
         }
-        for(j = 2; j < 6; ++j) printf("%d, ", swaddr_read(tmp + j*4, 4));
-        printf("%d)\n", swaddr_read(tmp + j * 4, 4));
+        if(tmp + j * 4 > 0 && tmp + j * 4 < 0x8000000)
+            printf("%d", swaddr_read(tmp + j * 4, 4));
+        printf(")\n");
         addr = swaddr_read(tmp + 4, 4);
         tmp = swaddr_read(tmp, 4);
     }
