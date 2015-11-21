@@ -38,4 +38,4 @@
     int i; \
     for(i = 0; i < 8; ++i) cpu.PF ^= (result & 0xff) >> i; \
     cpu.ZF = !result; \
-    cpu.SF = !MSB(result);
+    cpu.SF = MSB(result);
