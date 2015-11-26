@@ -83,15 +83,19 @@ static int cmd_info(char *args) {
 
 static int cmd_x(char* args){
     //扫描内存 
-    int n,address;
+    int n, address;
+    char expre[32];
     if(args == NULL){
         printf("please input arguments\ntype 'help' to get more informations\n");
         return 0;
     }
-    if(sscanf(args,"%d %x",&n,&address) != 2){
+    if(sscanf(args,"%d %s",&n,expre) != 2){
         printf("wrong arguments\n");
         return 0;
     }
+    bool success = true;
+    address = expr(expre, &success);
+    if(!success) return 0;
     
     int i;
     for(i = 0;i < n; ++i){
