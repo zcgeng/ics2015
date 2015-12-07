@@ -71,9 +71,17 @@ static int cmd_info(char *args) {
             printf("%s\t0x%x\t\t%u\n",regsb[i],reg_b(i),reg_b(i));
         }
 
-        printf("eip\t0x%0x\t%d\n",cpu.eip,cpu.eip);
+        printf("eip\t0x%x\t%d\n",cpu.eip,cpu.eip);
+        printf("eflags\t0x%8x\t%d\n",cpu.eflags, cpu.eflags);
+        printf("CF\t%x\n",cpu.CF);
+        printf("PF\t%x\n",cpu.PF);
+        printf("ZF\t%x\n",cpu.ZF);
+        printf("SF\t%x\n",cpu.SF);
+        printf("IF\t%x\n",cpu.IF);
+        printf("DF\t%x\n",cpu.DF);
+        printf("OF\t%x\n",cpu.OF);
     }else if(command == 'w'){
-        //DONE:打印监视点信息
+        //打印监视点信息
         print_wp();
     }else{
         printf("Unknown command: info %c\n",command);
@@ -151,6 +159,30 @@ static int cmd_d(char *args){
     return 0;
 }
 
+bool get_fun(uint32_t, char*);
+static int cmd_bt(char *args){
+    if(args != NULL)
+        printf("(there is no need to input any arguments)\n");
+    uint32_t tmp = cpu.ebp;
+    uint32_t addr = cpu.eip;
+    char name[32];
+    int i = 0, j;
+    while(get_fun(addr, name)){
+        name[31] = '\0';
+        printf("#%02d  %08x in %s(",i++, addr, name);
+        for(j = 2; j < 6; ++j){
+            if(tmp + j * 4 > 0 && tmp + j * 4 < 0x8000000)
+                printf("%d, ", swaddr_read(tmp + j*4, 4));
+        }
+        if(tmp + j * 4 > 0 && tmp + j * 4 < 0x8000000)
+            printf("%d", swaddr_read(tmp + j * 4, 4));
+        printf(")\n");
+        addr = swaddr_read(tmp + 4, 4);
+        tmp = swaddr_read(tmp, 4);
+    }
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -161,12 +193,13 @@ static struct {
 	{ "help", "Display informations about all supported commands", cmd_help },
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
-    { "si", "si [N] top the program after N instructions.(N : default 1)" , cmd_si },
-    { "info", "info r : print out the register",cmd_info },
+    { "si", "si [N] stop the program after N instructions.(N : default 1)" , cmd_si },
+    { "info", "info r : print out the register\ninfo w : print out the watch points",cmd_info },
     { "x", "x N EXPR : Calculate the EXPR and print the RAM of the next N DWORDs from the result of EXPR",cmd_x },
     { "p", "p EXPR : Calculate the EXPR and print the result out.",cmd_p },
     { "w", "w EXPR : create a watchpoint of an expression, when the value changed, the program will stop.", cmd_w },
-    { "d", "d NO : delete the watchpoint which has number NO.", cmd_d }
+    { "d", "d NO : delete the watchpoint which has number NO.", cmd_d },
+    { "bt", "print backtrace of all stack frames.", cmd_bt }
 	/* TODO: Add more commands */
 
 };
