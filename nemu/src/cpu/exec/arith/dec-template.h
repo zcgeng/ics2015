@@ -6,9 +6,13 @@ static void do_execute () {
 	DATA_TYPE result = op_src->val - 1;
 	OPERAND_W(op_src, result);
 
-	/* TODO: Update EFLAGS. */
-	panic("please implement me");
-
+	/* DONE: Update EFLAGS. */
+	//panic("please implement me");
+	update_EFLAGS_PZS(result);
+	//OF: overflow flag
+	if( result == ~(-1 << (DATA_BYTE - 1)) ) 
+		cpu.OF = 1; 
+	else cpu.OF = 0;
 	print_asm_template1();
 }
 
