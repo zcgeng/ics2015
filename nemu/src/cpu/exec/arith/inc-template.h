@@ -10,7 +10,7 @@ static void do_execute () {
 	//panic("please implement me");
 	update_EFLAGS_PZS(result);
 	//OF: overflow flag, 只有最大正数+1会溢出
-	if( result == ~(-1 << DATA_BYTE) ) 
+	if( result == ~((-1 << (8 * DATA_BYTE - 1)) << 1) ) 
 		cpu.OF = 1; 
 	else cpu.OF = 0;
 
