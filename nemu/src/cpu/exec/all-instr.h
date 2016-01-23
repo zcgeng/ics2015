@@ -2,6 +2,7 @@
 
 #include "data-mov/mov.h"
 #include "data-mov/push.h"
+#include "data-mov/pop.h"
 #include "data-mov/xchg.h"
 
 #include "arith/add.h"
