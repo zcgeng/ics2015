@@ -1,210 +1,208 @@
 #include "cpu/exec/template-start.h"
 
-#if DATA_BYTE == 1
-#define CODE_LEN 2
-#endif
-#if DATA_BYTE == 2
-#define CODE_LEN 4
-#endif
-#if DATA_BYTE == 4
-#define CODE_LEN 6
-#endif
-
-#define get_new_eip()\
-	int32_t val = op_src->val;\
-	val = val << (32 - DATA_BYTE * 8);\
-	val = val >> (32 - DATA_BYTE * 8);\
-	uint32_t new_eip = cpu.eip + val;\
-	if(DATA_BYTE == 2) new_eip &= 0xffff;\
-	print_asm(str(instr) " $0x%x", new_eip + CODE_LEN);
-
 /*---------------------------------------------*/
-#define instr jo
+#define instr seto
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.OF == 1) cpu.eip = new_eip;
+	if(cpu.OF == 1) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jno
+#define instr setno
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.OF == 0) cpu.eip = new_eip;
+	if(cpu.OF == 0) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jb
+#define instr setb
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.CF == 1) cpu.eip = new_eip;
+	if(cpu.CF == 1) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jae
+#define instr setae
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.CF == 0) cpu.eip = new_eip;
+	if(cpu.CF == 0) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr je
+#define instr sete
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.ZF == 1) cpu.eip = new_eip;
+	if(cpu.ZF == 1) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jne
+#define instr setne
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.ZF == 0) cpu.eip = new_eip;
+	if(cpu.ZF == 0) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jbe
+#define instr setbe
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.CF == 1 || cpu.ZF == 1) cpu.eip = new_eip;
+	if(cpu.CF == 1 || cpu.ZF == 1) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr ja
+#define instr seta
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.CF == 0 && cpu.ZF == 0) cpu.eip = new_eip;
+	if(cpu.CF == 0 && cpu.ZF == 0) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr js
+#define instr sets
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.SF == 1) cpu.eip = new_eip;
+	if(cpu.SF == 1) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jns
+#define instr setns
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.SF == 0) cpu.eip = new_eip;
+	if(cpu.SF == 0) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jp
+#define instr setp
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.PF == 1) cpu.eip = new_eip;
+	if(cpu.PF == 1) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jnp
+#define instr setnp
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.PF == 0) cpu.eip = new_eip;
+	if(cpu.PF == 0) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jl
+#define instr setl
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.SF != cpu.OF) cpu.eip = new_eip;
+	if(cpu.SF != cpu.OF) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jge
+#define instr setge
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.SF == cpu.OF) cpu.eip = new_eip;
+	if(cpu.SF == cpu.OF) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jle
+#define instr setle
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.ZF == 1 || cpu.SF != cpu.OF) cpu.eip = new_eip;
+	if(cpu.ZF == 1 || cpu.SF != cpu.OF) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jg
+#define instr setg
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.ZF == 0 && cpu.SF == cpu.OF) cpu.eip = new_eip;
+	if(cpu.ZF == 0 && cpu.SF == cpu.OF) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 
 #undef instr
 /*---------------------------------------------*/
-#define instr jcxz
+#define instr setcxz
 
 static void do_execute() {
-	get_new_eip();
-	if(cpu.ecx == 0) cpu.eip = new_eip;
+	if(cpu.ecx == 0) OPERAND_W(op_src, 1);
+	else OPERAND_W(op_src, 0);
+	print_asm_template1();
 }
 
 make_instr_helper(i)
 #undef instr
 /*---------------------------------------------*/
 
-#undef CODE_LEN
 #include "cpu/exec/template-end.h"
