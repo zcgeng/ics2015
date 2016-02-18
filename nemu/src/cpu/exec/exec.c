@@ -202,7 +202,7 @@ helper_fun _2byte_opcode_table [256] = {
 /* 0x98 */	sets_i_b, setns_i_b, setp_i_b, setnp_i_b, 
 /* 0x9c */	setl_i_b, setge_i_b, setle_i_b, setg_i_b, 
 /* 0xa0 */	inv, inv, inv, inv, 
-/* 0xa4 */	inv, inv, inv, inv,
+/* 0xa4 */	movs_b, movs_v, inv, inv,
 /* 0xa8 */	inv, inv, inv, inv,
 /* 0xac */	inv, inv, inv, imul_rm2r_v,
 /* 0xb0 */	inv, inv, inv, inv, 
