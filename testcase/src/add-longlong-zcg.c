@@ -5,7 +5,7 @@ long long add(long long a, long long b) {
 	return c;
 }
 int main() {
-	int a = add(0x7fffffffffffffffLL, 0);
+	long long a = add(0x7fffffffffffffffLL, 0);
 	nemu_assert(a == 0x7fffffffffffffffLL);
 
 	HIT_GOOD_TRAP;
