@@ -3,6 +3,13 @@
 typedef unsigned char uint8_t;
 typedef char bool;
 
+bool getbit(void *buf, int offset){
+	int byte = offset >> 3;
+	offset &= 7;
+	uint8_t mask = 1 << offset;
+	return (((uint8_t *)buf)[byte] & mask) != 0;
+}
+
 void setbit(void *buf, int offset, bool bit){
 	int byte = offset >> 3;
 	offset &= 7;
@@ -16,6 +23,7 @@ int main() {
 	uint8_t buf[2];
 
 	buf[0] = 0xaa; 
+	
 
 	setbit(buf, 8, 1);
 	setbit(buf, 9, 0);
