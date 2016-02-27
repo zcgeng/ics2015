@@ -12,7 +12,7 @@ static void do_execute() {
         cpu.OF = 1; 
     else cpu.OF = 0;
     //CF: 
-    if(MSB(result) != MSB(op_dest->val)) cpu.CF = 1;
+    if(result == op_dest->val + op_src->val) cpu.CF = 1;
     else cpu.CF = 0;
     OPERAND_W(op_dest, result); //先判断EFLAGS变化, 最后再改变op_dest的值
 	print_asm_template2();
