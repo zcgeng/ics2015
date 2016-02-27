@@ -6,7 +6,8 @@ static void do_execute() {
     DATA_TYPE result = op_dest->val - op_src->val;
     update_EFLAGS_PZS(result);
     //CF: 借位
-    cpu.CF = (op_dest->val > op_src->val) ? 0 : 1;
+    cpu.CF = (((long long)op_dest->val - (long long)op_src->val) >> (8 * DATA_BYTE)) & 1;
+    //Log("%d, %x, %x, %x\n", cpu.CF,op_dest->val,op_src->val,DATA_BYTE);
     //AF: 低三位是否借位
     cpu.AF = (op_dest->val & 0x7) > (op_src->val & 0x7) ? 0 : 1;
     //OF: overflow flag, 同号相减不会溢出;异号相减, 结果与被减数反号则溢出.
