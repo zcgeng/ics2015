@@ -12,8 +12,10 @@ static void do_execute() {
         cpu.OF = 1; 
     else cpu.OF = 0;
     //CF: 
-    if(result == op_dest->val + op_src->val) cpu.CF = 1;
+    long long resultLL = (long long)op_dest->val + (long long)op_src->val;
+    if(resultLL >> (8 * DATA_BYTE)) cpu.CF = 1;
     else cpu.CF = 0;
+    //Log("result = %x, resultLL>> = %llx, DATA_BYTE = %d, dest = %x, src = %x\n",result,  resultLL>> (8 * DATA_BYTE), DATA_BYTE, op_dest->val, op_src->val);
     OPERAND_W(op_dest, result); //先判断EFLAGS变化, 最后再改变op_dest的值
 	print_asm_template2();
 }

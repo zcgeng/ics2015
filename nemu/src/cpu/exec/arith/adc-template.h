@@ -12,7 +12,8 @@ static void do_execute() {
         cpu.OF = 1; 
     else cpu.OF = 0;
     //CF: 
-    if(MSB(result) != MSB(op_dest->val)) cpu.CF = 1;
+     long long resultLL = (long long)op_dest->val + (long long)op_src->val + (long long) cpu.CF;
+    if(resultLL >> (8 * DATA_BYTE)) cpu.CF = 1;
     else cpu.CF = 0;
     OPERAND_W(op_dest, result);
     print_asm_template2();
