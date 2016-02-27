@@ -9,7 +9,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -21,7 +21,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -33,7 +33,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -45,7 +45,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -57,7 +57,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -69,7 +69,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -81,7 +81,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -93,7 +93,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -105,7 +105,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -117,7 +117,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -129,7 +129,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -141,7 +141,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -153,7 +153,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -165,7 +165,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -177,7 +177,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -189,7 +189,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 
 #undef instr
 /*---------------------------------------------*/
@@ -201,7 +201,7 @@ static void do_execute() {
 	print_asm_template1();
 }
 
-make_instr_helper(i)
+make_instr_helper(rm)
 #undef instr
 /*---------------------------------------------*/
 
