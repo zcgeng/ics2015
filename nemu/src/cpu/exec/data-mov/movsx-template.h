@@ -3,13 +3,10 @@
 #define instr movsx
 
 static void do_execute() {
-	DATA_TYPE_S result = op_src->val;
-	//Log("0x%x %d %d %d\n",result, op_src->val, (int)op_dest->size, (int)op_src->size);
-	result <<= (op_src->size - op_dest->size) * 8;
-	//Log("0x%x\n", result);
-	result >>= (op_src->size - op_dest->size) * 8;
-	//Log("0x%x\n", result);
-	OPERAND_W(op_dest, result);
+	uint32_t result = op_src->val;
+	if (MSB(result))
+		result = (0xffffffff << (DATA_BYTE * 8)) | op_src->val;
+	write_operand_l(op_dest, result);
 	print_asm_template2();
 }
 
