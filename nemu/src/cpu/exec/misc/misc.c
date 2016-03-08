@@ -31,6 +31,6 @@ make_helper(cwd){
 }
 
 make_helper(cld){
-	cpu.df = 0;
+	cpu.DF = 0;
 	return 1;
 }
