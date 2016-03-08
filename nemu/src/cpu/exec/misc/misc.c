@@ -29,3 +29,8 @@ make_helper(cwd){
 	print_asm("cwd/cdq");
 	return 1;
 }
+
+make_helper(cld){
+	cpu.df = 0;
+	return 1;
+}
