@@ -56,7 +56,7 @@ count :
 	find . -name "*.[hc]"|xargs cat|grep -v ^$$|wc -l 
 	@echo "lines without empty lines"
 
-USERPROG := obj/testcase/to-lower-case
+USERPROG := obj/testcase/wanshu
 ENTRY := $(USERPROG)
 
 entry: $(ENTRY)
