@@ -7,7 +7,7 @@ static void do_execute() {
 		cpu.eip += op_src->val;
 	else
 		cpu.eip = (op_src->val) - 2;
-	Log("eip = 0x%x src = 0x%x\n", cpu.eip, op_src->val);
+	//Log("eip = 0x%x src = 0x%x\n", cpu.eip, op_src->val);
 	if(DATA_BYTE == 2)
 		cpu.eip &= 0x0000ffff;
 	print_asm("jmp $0x%x", cpu.eip + DATA_BYTE + 1);
