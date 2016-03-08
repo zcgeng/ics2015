@@ -37,6 +37,7 @@
 #include "logic/shr.h"
 #include "logic/shrd.h"
 
+#include "string/cmps.h"
 #include "string/movs.h"
 #include "string/rep.h"
 #include "string/stos.h"
