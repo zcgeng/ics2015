@@ -3,11 +3,12 @@
 #define instr movsx
 
 static void do_execute() {
-	DATA_TYPE result = op_src->val;
-	if(result >> (8 * op_src->size - 1) == 1) //如果是负数
-		result |= ((1 << 8 * (DATA_BYTE - op_src->size))-1) << 8 * op_src->size;
-	else //正数
-		result &= ((1 << 8 * op_src->size)-1);
+	DATA_TYPE_S result = op_src->val;
+	//Log("0x%x %d %d %d\n",result, op_src->val, (int)op_dest->size, (int)op_src->size);
+	result <<= (op_src->size - op_dest->size) * 8;
+	//Log("0x%x\n", result);
+	result >>= (op_src->size - op_dest->size) * 8;
+	//Log("0x%x\n", result);
 	OPERAND_W(op_dest, result);
 	print_asm_template2();
 }

@@ -25,7 +25,7 @@ make_helper(lea) {
 }
 
 make_helper(cwd){
-	cpu.edx = (cpu.eax>>31);
+	cpu.edx = (cpu.eax>>31 == 1 ? 0xffffffff : 0);
 	print_asm("cwd/cdq");
 	return 1;
 }
