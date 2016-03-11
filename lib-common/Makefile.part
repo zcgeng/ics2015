@@ -7,3 +7,7 @@ $(FLOAT): $(FLOAT_OBJ)
 
 # TODO: write a rule for generating $(FLOAT_OBJ)
 
+$(FLOAT_OBJ):
+	rm -rf obj/$(LIB_COMMON_DIR)/
+	mkdir obj/$(LIB_COMMON_DIR)/
+	gcc -c -m32 -fno-builtin $(LIB_COMMON_DIR)/FLOAT.c -I $(LIB_COMMON_DIR) -o obj/$(LIB_COMMON_DIR)/FLOAT.o
