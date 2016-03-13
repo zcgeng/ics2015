@@ -10,19 +10,23 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
-	unsigned long long A = Fabs(a), B = Fabs(b);
-    unsigned long long l = 0, r = 0xffffffffffffffffll, middle;
-    A = A << 16;
-    while(l < r){
-        middle = (l + r) >> 1;
-        //printf("middle = 0x%llx\n", middle);
-        unsigned long long tmp = middle * B;
-        if(tmp < A) l = middle + 1;
-        else if(tmp > A) r = middle - 1;
-        else break;
-    }
-    long long ans = middle;
-    if((a < 0 && b > 0) || (a > 0 && b < 0)) ans = -ans;
+	long long A = Fabs(a);
+	long long B = Fabs(b);
+	int c;
+	FLOAT ans = 0;;
+	A <<= 16;
+	B <<= 16;
+	c = 16;
+	while(A != 0) {
+		if (A >= B) {
+			A = A - B;
+			ans = ans | (1 << c);
+		}
+		if (c == 0) break;
+		B = B >> 1;
+		c --;
+	}
+	if ((a < 0 &&  b > 0) || (a > 0 && b < 0)) ans = -ans;
 	return ans;
 }
 
