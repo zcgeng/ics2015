@@ -4,31 +4,21 @@
 #include "trap.h"
 
 typedef int FLOAT;
-typedef struct floatStruct
-{
-	unsigned int tailCode		:23;
-	unsigned int orderCode		:8;
-	unsigned int sign		:1;
-}FloatStruct;
 
 static inline int F2int(FLOAT a) {
-	int result = a>>16;
-	return result;
+	return a >> 16;
 }
 
 static inline FLOAT int2F(int a) {
-	FLOAT result = a<<16;
-	return result;
+	return a << 16;
 }
 
 static inline FLOAT F_mul_int(FLOAT a, int b) {
-	FLOAT result = a*b;
-	return result;
+	return a * b;
 }
 
 static inline FLOAT F_div_int(FLOAT a, int b) {
-	FLOAT result = a/b;
-	return result;
+	return a / b;
 }
 
 FLOAT f2F(float);

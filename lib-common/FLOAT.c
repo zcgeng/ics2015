@@ -3,65 +3,43 @@
 #include <stdlib.h>
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
-	long long A = a<0?-a:a;
-	long long B = b<0?-b:b;
-	long long temp = A*B;
-	FLOAT result = (FLOAT)(temp>>16);
-	if ((a < 0 &&  b > 0) || (a > 0 && b < 0)) result = -result;
-	return result;
+	long long A = a;
+	long long B = b;
+	long long ans = A * B;
+	return ans>>16;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
-	long long remain = a<0?-a:a;
-	long long divisor = b<0?-b:b;
-	int count;
-	FLOAT result = 0;;
-	remain = remain << 16;
-	divisor = divisor << 16;
-	count = 16;
-	while(remain != 0) {
-		if (remain >= divisor) {
-			remain = remain - divisor;
-			result = result | (1 << count);
-		}
-		if (count == 0) break;
-		divisor = divisor >> 1;
-		count --;
-	}
-	if ((a < 0 &&  b > 0) || (a > 0 && b < 0)) result = -result;
-	return result;
+	unsigned long long A = Fabs(a), B = Fabs(b);
+    unsigned long long l = 0, r = 0xffffffffffffffffll, middle;
+    A = A << 16;
+    while(l < r){
+        middle = (l + r) >> 1;
+        //printf("middle = 0x%llx\n", middle);
+        unsigned long long tmp = middle * B;
+        if(tmp < A) l = middle + 1;
+        else if(tmp > A) r = middle - 1;
+        else break;
+    }
+    long long ans = middle;
+    if((a < 0 && b > 0) || (a > 0 && b < 0)) ans = -ans;
+	return ans;
 }
 
 FLOAT f2F(float a) {
-	FLOAT result;
-	unsigned int resultSign;
-	unsigned int resultInteger;
-	unsigned int resultFraction;
-	FloatStruct *floatStruct = &a;
-	unsigned int tailCode = floatStruct->tailCode & 0x007fffff;
-	unsigned int orderCode = (floatStruct->orderCode & 0x000000ff)-127;
-	unsigned int sign = floatStruct->sign & 0x1;
-	if (orderCode >= -16 ||orderCode <= 14) {
-		resultSign = sign;
-		if (orderCode <= -1) {
-			resultInteger = 0;
-			//printf("%d\n", orderCode);
-			resultFraction = tailCode >> (23-(16+orderCode)) | (1 << (16+orderCode));
-		}
-		else {
-			resultInteger = 1 << orderCode | tailCode >> (23-orderCode) ;
-			resultFraction = ((~(1 << 31)) >>(31-23+orderCode)) & 0xffff;
-		}
-		if (resultSign)
-			result = resultSign << 31 | (~(resultInteger << 16 | resultFraction) +1);
-		else
-			result = resultSign << 31 | resultInteger << 16 | resultFraction;
-
+	int i, uf, m, e, s, ans;
+	uf = *(int*)&a;
+	m = uf & ((1 << 23) - 1);
+	e = ((uf >> 23) & ((1 << 8) - 1)) - 127;
+	s = uf >> 31;
+	ans = 1;
+	for(i = 1; i <= e + 16; ++ i) {
+		ans = (ans << 1) + ((m & (1 << 22)) >> 22);
+		if (ans < 0) return 0x80000000u;
+		m = m << 1;
 	}
-	else 
-		result = 0;
-	//printf("%d, %d, %d\n", floatStruct->tailCode, floatStruct->orderCode, floatStruct->sign);
-	return result;
+	if (s != 0) ans = (~ans) + 1;
+	return (FLOAT)(ans);
 }
 
 FLOAT Fabs(FLOAT a) {
