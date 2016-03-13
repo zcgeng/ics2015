@@ -57,7 +57,8 @@ count :
 	@echo "lines without empty lines"
 
 USERPROG := obj/testcase/quadratic-eq
-ENTRY := $(USERPROG)
+#ENTRY := $(USERPROG)
+ENTRY := $(kernel_BIN)
 
 entry: $(ENTRY)
 	objcopy -S -O binary $(ENTRY) entry
