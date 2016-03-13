@@ -3,8 +3,10 @@
 #define instr push
 
 static void do_execute() {
-	cpu.esp -= DATA_BYTE;
-	MEM_W(cpu.esp, op_src->val);
+	int len;
+	if(DATA_BYTE == 2) len = 2; else len = 4;
+	cpu.esp -= len;
+	swaddr_write(cpu.esp, len, op_src->val);
 	print_asm_template1();
 }
 
