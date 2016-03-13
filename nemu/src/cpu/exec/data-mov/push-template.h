@@ -3,18 +3,8 @@
 #define instr push
 
 static void do_execute() {
-	cpu.esp -= 4;
-	if(DATA_BYTE == 1){
-		op_src->val &= 0x000000ff;
-		op_src->val <<= 24;
-		op_src->val >>= 24;
-	}
-	else if(DATA_BYTE == 2){
-		op_src->val &= 0x0000ffff;
-		op_src->val <<= 16;
-		op_src->val >>= 16;
-	}
-	swaddr_write(cpu.esp, 4, op_src->val);
+	cpu.esp -= DATA_BYTE;
+	MEM_W(cpu.esp, op_src->val);
 	print_asm_template1();
 }
 
