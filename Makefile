@@ -56,9 +56,9 @@ count :
 	find . -name "*.[hc]"|xargs cat|grep -v ^$$|wc -l 
 	@echo "lines without empty lines"
 
-USERPROG := obj/testcase/erfenfa
-ENTRY := $(USERPROG)
-#ENTRY := $(kernel_BIN)
+USERPROG := obj/testcase/switch
+#ENTRY := $(USERPROG)
+ENTRY := $(kernel_BIN)
 
 entry: $(ENTRY)
 	objcopy -S -O binary $(ENTRY) entry
