@@ -22,9 +22,9 @@ void dram_write(hwaddr_t, size_t, uint32_t);
 
 typedef union{
     struct{
-        uint32_t tag : CACHE_TAG_BITS;
-        uint32_t index : CACHE_INDEX_BITS;
         uint32_t block_offset : BLOCK_OFFSET_BITS;
+        uint32_t index : CACHE_INDEX_BITS;
+        uint32_t tag : CACHE_TAG_BITS;
     };
     uint32_t addr;
 }cache_addr;
@@ -132,16 +132,7 @@ void cache_write(hwaddr_t addr, size_t len, uint32_t data){
 }
 
 void cache_debug(hwaddr_t addr){
-#define CACHE_SIZE (64 << 10) 
-#define BLOCK_SIZE 64
-#define WAY_NUM 8
-#define BLOCK_NUM (CACHE_SIZE / BLOCK_SIZE) 
-#define LINES_PER_GROUP (BLOCK_NUM / WAY_NUM)
-#define ADDRESS_BITS 32 
-#define BLOCK_OFFSET_BITS 6
-#define CACHE_INDEX_BITS 7
-#define CACHE_TAG_BITS (ADDRESS_BITS - BLOCK_OFFSET_BITS - CACHE_INDEX_BITS)
-    printf("%x %x\n", CACHE_SIZE, CACHE_TAG_BITS);
+    printf("%d %d\n", CACHE_SIZE, CACHE_TAG_BITS);
     int i;
     cache_addr caddr;
     caddr.addr = addr;
