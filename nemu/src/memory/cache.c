@@ -81,7 +81,7 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
         }
     }
     // miss: find the block to replace
-    Log("miss\n");
+    //Log("miss\n");
     for(i = 0; i < LINES_PER_GROUP; ++i)
         if(cache[caddr.index][i].valid == 0) break;
     if( i == LINES_PER_GROUP ){
