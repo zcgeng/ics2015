@@ -42,12 +42,8 @@ cache_block cache[WAY_NUM][LINES_PER_GROUP];
 void init_cache(){
     int i, j;
     for(i = 0; i < WAY_NUM; ++i)
-        for(j = 0; j < LINES_PER_GROUP; ++j){
+        for(j = 0; j < LINES_PER_GROUP; ++j)
             cache[i][j].valid = 0;
-            int k = 0;
-            for(k = 0; k < BLOCK_SIZE; ++k)
-                cache[i][j].block[k] = 0;
-    }
 }
 
 uint32_t cache_read(hwaddr_t addr, size_t len){
