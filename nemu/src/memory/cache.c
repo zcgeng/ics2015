@@ -142,8 +142,10 @@ void cache_debug(hwaddr_t addr){
             // hit: read the cache
             uint32_t tmp;
             memcpy(&tmp, &cache[caddr.index][i].block[caddr.block_offset], 4);
-            printf("value at address 0x%8x is 0x%08x\n", addr, tmp);
-            printf("cache block:\n");
+            printf("value at address 0x%08x is 0x%08x\n", addr, tmp);
+            cache_addr tmpaddr = caddr;
+            tmpaddr.block_offset = 0;
+            printf("cache block: begin at address %08x\n", tmpaddr.addr);
             int j = 0;
             for(j = 0; j < BLOCK_SIZE; ++j){
                 printf("%02x ", cache[caddr.index][i].block[j]);
