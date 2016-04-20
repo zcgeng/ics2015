@@ -159,6 +159,21 @@ static int cmd_d(char *args){
     return 0;
 }
 
+void cache_debug(hwaddr_t addr);
+static int cmd_cache(char* args){
+    if(args == NULL){
+        printf("Please input a number!\n");
+        return 0;
+    }
+    char expre[32];
+    sscanf(args, "%s", expre);
+    int addr = 0;
+    bool success = true;
+    addr = expr(expre, &success);
+    cache_debug(addr);
+    return 0;
+}
+
 bool get_fun(uint32_t, char*);
 static int cmd_bt(char *args){
     if(args != NULL)
@@ -199,7 +214,8 @@ static struct {
     { "p", "p EXPR : Calculate the EXPR and print the result out.",cmd_p },
     { "w", "w EXPR : create a watchpoint of an expression, when the value changed, the program will stop.", cmd_w },
     { "d", "d NO : delete the watchpoint which has number NO.", cmd_d },
-    { "bt", "print backtrace of all stack frames.", cmd_bt }
+    { "bt", "print backtrace of all stack frames.", cmd_bt },
+    { "cache", "cache ADDR ---test whether the ADDR is in the cache, without changing the cache", cmd_cache }
 	/* TODO: Add more commands */
 
 };

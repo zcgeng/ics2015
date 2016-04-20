@@ -130,3 +130,31 @@ void cache_write(hwaddr_t addr, size_t len, uint32_t data){
     }
     dram_write(addr, len, data);
 }
+
+void cache_debug(hwaddr_t addr){
+    int i;
+    cache_addr caddr;
+    caddr.addr = addr;
+    printf("addr = 0x%08x, tag = 0x%x, index = 0x%x, offset = 0x%x\n", addr, caddr.tag, caddr.index, caddr.block_offset);
+    for(i = 0; i < LINES_PER_GROUP; ++i){
+        if(cache[caddr.index][i].valid == 1 && cache[caddr.index][i].tag == caddr.tag){
+            printf("hit at cache[index=0x%x][i=0x%x]\n", caddr.index, i);
+            // hit: read the cache
+            uint32_t tmp;
+            memcpy(&tmp, &cache[caddr.index][i].block[caddr.block_offset], 4);
+            printf("value at address 0x%8x is 0x%08x\n", addr, tmp);
+            printf("cache block:\n");
+            int j = 0;
+            for(j = 0; j < BLOCK_SIZE; ++j){
+                printf("%02x ", cache[caddr.index][i].block[j]);
+                if(j % 8 == 7) printf("\n");
+            }
+            printf("\n");
+            return;
+        }
+    }
+    printf("missed! the 0x%x group of cache:\n", caddr.index);
+    for(i = 0; i < LINES_PER_GROUP; ++i){
+        printf("cache[0x%x][0x%x]: valid:%d, tag:0x%x\n", caddr.index, i,cache[caddr.index][i].valid,cache[caddr.index][i].tag);
+    }
+}
