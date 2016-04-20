@@ -59,6 +59,7 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
                 return tmp;
             }
             else{
+                Log("hello\n");
                 uint32_t tmp;
                 uint32_t len2 = len + caddr.block_offset - BLOCK_SIZE;
                 uint32_t len1 = len - len2;
