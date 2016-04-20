@@ -139,7 +139,7 @@ void cache_debug(hwaddr_t addr){
     printf("addr = 0x%08x, tag = 0x%x, index = 0x%x, offset = 0x%x\n", addr, caddr.tag, caddr.index, caddr.block_offset);
     for(i = 0; i < LINES_PER_GROUP; ++i){
         if(cache[caddr.index][i].valid == 1 && cache[caddr.index][i].tag == caddr.tag){
-            printf("hit at cache[index=0x%x][i=0x%x]\n", caddr.index, i);
+            printf("hit at cache[index=0x%x][i=0x%x], block tag:%x\n", caddr.index, i, cache[caddr.index][i].tag);
             // hit: read the cache
             uint32_t tmp;
             memcpy(&tmp, &cache[caddr.index][i].block[caddr.block_offset], 4);
