@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "stdlib.h"
+#include "time.h"
 #define CACHE_SIZE (64 << 10) 
 #define BLOCK_SIZE 64
 #define WAY_NUM 8
@@ -63,15 +64,15 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
                 uint32_t len1 = len - len2;
                 switch(len1){
                     case 1:
-                        memcpy(&tmp + 1, &cache[caddr.index][i].block[caddr.block_offset], 1);
+                        memcpy(&tmp, &cache[caddr.index][i].block[caddr.block_offset], 1);
                         unalign_rw(&tmp + 1, 3) = cache_read(addr + 1, 3); //the second time to read the cache
                     break;
                     case 2:
-                        memcpy(&tmp + 2, &cache[caddr.index][i].block[caddr.block_offset], 2);
+                        memcpy(&tmp, &cache[caddr.index][i].block[caddr.block_offset], 2);
                         unalign_rw(&tmp + 2, 2) = cache_read(addr + 2, 2); 
                     break;
                     case 3:
-                        memcpy(&tmp + 3, &cache[caddr.index][i].block[caddr.block_offset], 3);
+                        memcpy(&tmp, &cache[caddr.index][i].block[caddr.block_offset], 3);
                         unalign_rw(&tmp + 3, 1) = cache_read(addr + 3, 1); 
                     break;
                 }
