@@ -16,6 +16,9 @@
 #define BLOCK_OFFSET_BITS 6
 #define CACHE_INDEX_BITS 7
 #define CACHE_TAG_BITS (ADDRESS_BITS - BLOCK_OFFSET_BITS - CACHE_INDEX_BITS)
+int32_t dram_read(hwaddr_t, size_t);
+void dram_write(hwaddr_t, size_t, uint32_t);
+
 typedef union{
     struct{
         uint32_t tag : CACHE_TAG_BITS;
@@ -44,9 +47,10 @@ void init_cache(){
 
 uint32_t cache_read(hwaddr_t addr, size_t len){
     int i;
-    cache_addr caddr = addr;
+    cache_addr caddr;
+    caddr.addr = addr;
     for(i = 0; i < LINES_PER_GROUP; ++i){
-        if(cache[caddr.index][i].valid = 1 && cache[caddr.index][i].tag == caddr.tag){
+        if(cache[caddr.index][i].valid == 1 && cache[caddr.index][i].tag == caddr.tag){
             // hit: read the cache
             if(len + caddr.block_offset <= BLOCK_SIZE){
                 uint32_t tmp;
@@ -57,15 +61,27 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
                 uint32_t tmp;
                 uint32_t len2 = len + caddr.block_offset - BLOCK_SIZE;
                 uint32_t len1 = len - len2;
-                memcpy(&unalign_rw(&tmp, len1), &cache[caddr.index][i].block[caddr.block_offset], len1);
-                unalign_rw(&tmp + len1, len2) = cache_read(addr + len1, len2); //the second time to read the cache
+                switch(len1){
+                    case 1:
+                        memcpy(&tmp + 1, &cache[caddr.index][i].block[caddr.block_offset], 1);
+                        unalign_rw(&tmp + 1, 3) = cache_read(addr + 1, 3); //the second time to read the cache
+                    break;
+                    case 2:
+                        memcpy(&tmp + 2, &cache[caddr.index][i].block[caddr.block_offset], 2);
+                        unalign_rw(&tmp + 2, 2) = cache_read(addr + 2, 2); 
+                    break;
+                    case 3:
+                        memcpy(&tmp + 3, &cache[caddr.index][i].block[caddr.block_offset], 3);
+                        unalign_rw(&tmp + 3, 1) = cache_read(addr + 3, 1); 
+                    break;
+                }
                 return tmp;
             }
         }
     }
     // miss: find the block to replace
     for(i = 0; i < LINES_PER_GROUP; ++i)
-        if(cache[caddr,index][i].valid == 0) break;
+        if(cache[caddr.index][i].valid == 0) break;
     if( i == LINES_PER_GROUP ){
         srand(time(0));
         i = rand() % LINES_PER_GROUP;
@@ -74,27 +90,39 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
     cache[caddr.index][i].tag = caddr.tag;
     cache[caddr.index][i].valid = 1;
     cache_addr tmpaddr = caddr;
-    tmpaddr.offset = 0;
+    tmpaddr.block_offset = 0;
     int j = 0;
     for(j = 0; j < BLOCK_SIZE; ++j){
-        cache[caddr.index][i].block[j] = dram_read(tmpaddr + j, 1); 
+        cache[caddr.index][i].block[j] = dram_read(tmpaddr.addr + j, 1); 
     }
     return cache_read(addr, len);
 }
 
 void cache_write(hwaddr_t addr, size_t len, uint32_t data){
-    cache_addr caddr = addr;
+    cache_addr caddr;
+    caddr.addr = addr;
     int i;
     for(i = 0; i < LINES_PER_GROUP; ++i){
         if(cache[caddr.index][i].valid == 1 && cache[caddr.index][i].tag == caddr.tag){
             if(caddr.block_offset + len <= BLOCK_SIZE)
                 memcpy(&cache[caddr.index][i].block[caddr.block_offset], &data, len);
             else{
-                uint32_t tmp;
                 uint32_t len2 = caddr.block_offset + len - BLOCK_SIZE;
                 uint32_t len1 = len - len2;
-                memcpy(&cache[caddr.index][i].block[caddr.block_offset], &unalign_rw(&data, len1), len1);
-                cache_write(addr + len1, len2, &unalign_rw(&data + len1, len2));
+                switch(len1){
+                    case 1:
+                        memcpy(&cache[caddr.index][i].block[caddr.block_offset], &unalign_rw(&data, 1), 1);
+                        cache_write(addr + 1, len2, unalign_rw(&data + 1, 3));
+                    break;
+                    case 2:
+                        memcpy(&cache[caddr.index][i].block[caddr.block_offset], &unalign_rw(&data, 2), 2);
+                        cache_write(addr + 2, len2, unalign_rw(&data + 2, 2));
+                    break;
+                    case 3:
+                        memcpy(&cache[caddr.index][i].block[caddr.block_offset], &unalign_rw(&data, 1), 1);
+                        cache_write(addr + 3, len2, unalign_rw(&data + 3, 1));
+                    break;
+                }
             }
         }
     }
