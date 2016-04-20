@@ -56,7 +56,6 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
             if(len + caddr.block_offset <= BLOCK_SIZE){
                 uint32_t tmp;
                 memcpy(&tmp, &cache[caddr.index][i].block[caddr.block_offset], len);
-                Log("tmp = %x\n", tmp);
                 return tmp;
             }
             else{
