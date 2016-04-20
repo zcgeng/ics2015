@@ -9,7 +9,8 @@ void cache_write(hwaddr_t, size_t, uint32_t);
 
 uint32_t hwaddr_read(hwaddr_t addr, size_t len) {
 	//return dram_read(addr, len) & (~0u >> ((4 - len) << 3));
-	if(cache_read(addr, len) != dram_read(addr, len)) Log("addr = %x, len = %d, cache : %x, dram : %x\n", addr, (int)len,cache_read(addr, len),dram_read(addr, len)  );
+	uint32_t d = dram_read(addr, len) & (~0u >> ((4 - len) << 3));
+	if(cache_read(addr, len) != d) Log("addr = %x, len = %d, cache : %x, dram : %x\n", addr, (int)len,cache_read(addr, len),d);
 	return cache_read(addr, len) & (~0u >> ((4 - len) << 3));
 }
 
