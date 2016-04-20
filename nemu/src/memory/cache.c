@@ -155,8 +155,9 @@ void cache_debug(hwaddr_t addr){
             return;
         }
     }
-    printf("missed! the 0x%x group of cache:\n", caddr.index);
+    printf("missed! the No.0x%x group of cache:(only show valid blocks)\n", caddr.index);
     for(i = 0; i < LINES_PER_GROUP; ++i){
-        printf("cache[0x%x][0x%x]: valid:%d, tag:0x%x\n", caddr.index, i,cache[caddr.index][i].valid,cache[caddr.index][i].tag);
+        if(cache[caddr.index][i].valid)
+            printf("cache[0x%x][0x%x]: valid:%d, tag:0x%x\n", caddr.index, i,cache[caddr.index][i].valid,cache[caddr.index][i].tag);
     }
 }
