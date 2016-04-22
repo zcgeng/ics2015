@@ -13,7 +13,7 @@ uint32_t hwaddr_read(hwaddr_t addr, size_t len) {
 	uint32_t c = cache_read(addr, len) & (~0u >> ((4 - len) << 3));
 	if(c != d){
 		Log("addr = %x, len = %d, cache : %x, dram : %x\n", addr, (int)len,c,d);
-		cache_debug(addr);
+		cache_debug(addr);			
 	}
 	return cache_read(addr, len) & (~0u >> ((4 - len) << 3));
 }
