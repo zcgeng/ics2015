@@ -15,7 +15,7 @@
 #define LINES_PER_GROUP (BLOCK_NUM / WAY_NUM)
 #define ADDRESS_BITS 32 
 #define BLOCK_OFFSET_BITS 6
-#define CACHE_INDEX_BITS 3
+#define CACHE_INDEX_BITS 7 //log(2, LINES_PER_GROUP)
 #define CACHE_TAG_BITS (ADDRESS_BITS - BLOCK_OFFSET_BITS - CACHE_INDEX_BITS)
 int32_t dram_read(hwaddr_t, size_t);
 void dram_write(hwaddr_t, size_t, uint32_t);
@@ -37,12 +37,12 @@ typedef struct{
     uint8_t block[BLOCK_SIZE];
 }cache_block;
 
-cache_block cache[WAY_NUM][LINES_PER_GROUP];
+cache_block cache[LINES_PER_GROUP][WAY_NUM];
 
 void init_cache(){
     int i, j;
-    for(i = 0; i < WAY_NUM; ++i)
-        for(j = 0; j < LINES_PER_GROUP; ++j)
+    for(i = 0; i < LINES_PER_GROUP; ++i)
+        for(j = 0; j < WAY_NUM; ++j)
             cache[i][j].valid = 0;
 }
 
@@ -50,7 +50,7 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
     int i;
     cache_addr caddr;
     caddr.addr = addr;
-    for(i = 0; i < LINES_PER_GROUP; ++i){
+    for(i = 0; i < WAY_NUM; ++i){
         if(cache[caddr.index][i].valid == 1 && cache[caddr.index][i].tag == caddr.tag){
             // hit: read the cache
             if(len + caddr.block_offset <= BLOCK_SIZE){
@@ -83,11 +83,11 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
     }
     // miss: find the block to replace
     //Log("miss\n");
-    for(i = 0; i < LINES_PER_GROUP; ++i)
+    for(i = 0; i < WAY_NUM; ++i)
         if(cache[caddr.index][i].valid == 0) break;
-    if( i == LINES_PER_GROUP ){
+    if( i == WAY_NUM ){
         srand(time(0));
-        i = rand() % LINES_PER_GROUP;
+        i = rand() % WAY_NUM;
     }
     // replace
     cache[caddr.index][i].tag = caddr.tag;
@@ -105,7 +105,7 @@ void cache_write(hwaddr_t addr, size_t len, uint32_t data){
     cache_addr caddr;
     caddr.addr = addr;
     int i;
-    for(i = 0; i < LINES_PER_GROUP; ++i){
+    for(i = 0; i < WAY_NUM; ++i){
         if(cache[caddr.index][i].valid == 1 && cache[caddr.index][i].tag == caddr.tag){
             if(caddr.block_offset + len <= BLOCK_SIZE)
                 memcpy(&cache[caddr.index][i].block[caddr.block_offset], &data, len);
@@ -130,7 +130,7 @@ void cache_debug(hwaddr_t addr){
     cache_addr caddr;
     caddr.addr = addr;
     printf("addr = 0x%08x, tag = 0x%x, index = 0x%x, offset = 0x%x\n", addr, caddr.tag, caddr.index, caddr.block_offset);
-    for(i = 0; i < LINES_PER_GROUP; ++i){
+    for(i = 0; i < WAY_NUM; ++i){
         if(cache[caddr.index][i].valid == 1 && cache[caddr.index][i].tag == caddr.tag){
             printf("hit at cache[index=0x%x][i=0x%x], block tag:%x\n", caddr.index, i, cache[caddr.index][i].tag);
             // hit: read the cache
@@ -150,7 +150,7 @@ void cache_debug(hwaddr_t addr){
         }
     }
     printf("missed! the No.0x%x group of cache:(only show valid blocks)\n", caddr.index);
-    for(i = 0; i < LINES_PER_GROUP; ++i){
+    for(i = 0; i < WAY_NUM; ++i){
         if(cache[caddr.index][i].valid)
             printf("cache[0x%x][0x%x]: valid:%d, tag:0x%x\n", caddr.index, i,cache[caddr.index][i].valid,cache[caddr.index][i].tag);
     }
