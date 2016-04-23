@@ -21,8 +21,8 @@
 #define BLOCK_NUM (CACHE_SIZE / BLOCK_SIZE) 
 #define GROUP_NUM (BLOCK_NUM / WAY_NUM)
 #define CACHE_TAG_BITS (ADDRESS_BITS - BLOCK_OFFSET_BITS - CACHE_INDEX_BITS)
-int32_t dram_read(hwaddr_t, size_t);
-void dram_write(hwaddr_t, size_t, uint32_t);
+int32_t cache2_read(hwaddr_t, size_t);
+void cache2_write(hwaddr_t, size_t, uint32_t);
 
 typedef union{
     struct{
@@ -101,7 +101,7 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
     tmpaddr.block_offset = 0;
     int j = 0;
     for(j = 0; j < BLOCK_SIZE; ++j){
-        cache[caddr.index][i].block[j] = dram_read(tmpaddr.addr + j, 1); 
+        cache[caddr.index][i].block[j] = cache2_read(tmpaddr.addr + j, 1); 
     }
     return cache_read(addr, len);
 }
@@ -128,7 +128,7 @@ void cache_write(hwaddr_t addr, size_t len, uint32_t data){
 	    break;
         }
     }
-    dram_write(addr, len, data);
+    cache2_write(addr, len, data);
 }
 
 void cache_debug(hwaddr_t addr){
