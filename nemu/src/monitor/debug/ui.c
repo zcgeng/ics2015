@@ -160,6 +160,7 @@ static int cmd_d(char *args){
 }
 
 void cache_debug(hwaddr_t addr);
+void cache2_debug(hwaddr_t addr);
 static int cmd_cache(char* args){
     if(args == NULL){
         printf("Please input a number!\n");
@@ -170,7 +171,11 @@ static int cmd_cache(char* args){
     int addr = 0;
     bool success = true;
     addr = expr(expre, &success);
+    if(success == false) return 0;
+    printf("-------------------In L1 cache-----------------\n");
     cache_debug(addr);
+    printf("-------------------In L2 cache-----------------\n");
+    cache2_debug(addr);
     return 0;
 }
 
