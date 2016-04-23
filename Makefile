@@ -56,7 +56,7 @@ count :
 	find . -name "*.[hc]"|xargs cat|grep -v ^$$|wc -l 
 	@echo "lines without empty lines"
 
-USERPROG := obj/testcase/hello-str
+USERPROG := obj/testcase/matrix-mul
 #ENTRY := $(USERPROG)
 ENTRY := $(kernel_BIN)
 

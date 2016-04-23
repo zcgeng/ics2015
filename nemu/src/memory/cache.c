@@ -8,14 +8,18 @@
 #include "common.h"
 #include "stdlib.h"
 #include "time.h"
-#define CACHE_SIZE (64 << 10) 
-#define BLOCK_SIZE 64
-#define WAY_NUM 8
-#define BLOCK_NUM (CACHE_SIZE / BLOCK_SIZE) 
-#define LINES_PER_GROUP (BLOCK_NUM / WAY_NUM)
+#include "math.h"
 #define ADDRESS_BITS 32 
+
 #define BLOCK_OFFSET_BITS 6
-#define CACHE_INDEX_BITS 7 //log(2, LINES_PER_GROUP)
+#define CACHE_SIZE (64 << 10) 
+#define WAY_NUM 8
+#define CACHE_INDEX_BITS 7 //log(2, GROUP_NUM)
+
+
+#define BLOCK_SIZE (1 << BLOCK_OFFSET_BITS)
+#define BLOCK_NUM (CACHE_SIZE / BLOCK_SIZE) 
+#define GROUP_NUM (BLOCK_NUM / WAY_NUM)
 #define CACHE_TAG_BITS (ADDRESS_BITS - BLOCK_OFFSET_BITS - CACHE_INDEX_BITS)
 int32_t dram_read(hwaddr_t, size_t);
 void dram_write(hwaddr_t, size_t, uint32_t);
@@ -37,11 +41,12 @@ typedef struct{
     uint8_t block[BLOCK_SIZE];
 }cache_block;
 
-cache_block cache[LINES_PER_GROUP][WAY_NUM];
+cache_block cache[GROUP_NUM][WAY_NUM];
 
 void init_cache(){
+    Assert((1 << CACHE_INDEX_BITS) == GROUP_NUM, "wrong cache_addr structure! CACHE_INDEX_BITS should be %d\n", (int)log2(GROUP_NUM));
     int i, j;
-    for(i = 0; i < LINES_PER_GROUP; ++i)
+    for(i = 0; i < GROUP_NUM; ++i)
         for(j = 0; j < WAY_NUM; ++j)
             cache[i][j].valid = 0;
 }
@@ -120,6 +125,7 @@ void cache_write(hwaddr_t addr, size_t len, uint32_t data){
 		}
 		cache_write(addr + len1, len2, data>>(len1*8));
             }
+	    break;
         }
     }
     dram_write(addr, len, data);
