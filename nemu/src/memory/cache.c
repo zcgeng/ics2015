@@ -149,7 +149,7 @@ void cache_debug(hwaddr_t addr){
             int j = 0;
             for(j = 0; j < BLOCK_SIZE; ++j){
                 printf("%02x ", cache[caddr.index][i].block[j]);
-                if(j % 8 == 7) printf("\n");
+                if(j % 16 == 15) printf("\n");
             }
             printf("\n");
             return;
@@ -161,3 +161,12 @@ void cache_debug(hwaddr_t addr){
             printf("cache[0x%x][0x%x]: valid:%d, tag:0x%x\n", caddr.index, i,cache[caddr.index][i].valid,cache[caddr.index][i].tag);
     }
 }
+#undef ADDRESS_BITS
+#undef BLOCK_OFFSET_BITS
+#undef CACHE_SIZE
+#undef WAY_NUM
+#undef CACHE_INDEX_BITS
+#undef BLOCK_SIZE
+#undef BLOCK_NUM
+#undef GROUP_NU
+#undef CACHE_TAG_BITS

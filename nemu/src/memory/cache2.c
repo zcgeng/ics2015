@@ -39,6 +39,8 @@ typedef struct{
         uint32_t valid : 1;
         uint32_t tag : CACHE_TAG_BITS;
     };
+    uint8_t block[BLOCK_SIZE];
+}cache2_block;
 cache2_block cache2[GROUP_NUM][WAY_NUM];
 
 void init_cache2(){
@@ -57,7 +59,7 @@ void cache2_write_back(uint32_t index, uint32_t num){
     cache2_addr caddr;
     caddr.index = index;
     caddr.tag = cache2[index][num].tag;
-    caddr.offset = 0;
+    caddr.block_offset = 0;
     for(j = 0; j < BLOCK_SIZE; ++j){
         caddr.block_offset = j;
         dram_write(caddr.addr, 1, cache2[index][num].block[j]);
@@ -66,7 +68,7 @@ void cache2_write_back(uint32_t index, uint32_t num){
 uint32_t cache2_read(hwaddr_t addr, size_t len){
     int i;
     cache2_addr caddr;
-    caddr2.addr = addr;
+    caddr.addr = addr;
     for(i = 0; i < WAY_NUM; ++i){
         if(cache2[caddr.index][i].valid == 1 && cache2[caddr.index][i].tag == caddr.tag){
             // hit: read the cache
@@ -76,13 +78,13 @@ uint32_t cache2_read(hwaddr_t addr, size_t len){
                 return tmp;
             }
             else{
-		//Log("I am unaligned\n");
+                //Log("I am unaligned\n");
                 uint32_t high, low;
                 uint32_t len2 = len + caddr.block_offset - BLOCK_SIZE;
                 uint32_t len1 = len - len2;
                 memcpy(&low, &cache2[caddr.index][i].block[caddr.block_offset], 4);
                 high = cache2_read(addr + len1, 4) << (len1*8);
-		//Log("high = %x, low = %x", high, low);
+                //Log("high = %x, low = %x", high, low);
                 switch(len1){
                     case 1:
                         unalign_rw(&high, 1) = low;
@@ -126,11 +128,12 @@ void cache2_write(hwaddr_t addr, size_t len, uint32_t data){
     int i;
     for(i = 0; i < WAY_NUM; ++i){
         if(cache2[caddr.index][i].valid == 1 && cache2[caddr.index][i].tag == caddr.tag){
-            if(caddr.block_offset + len <= BLOCK_SIZE)
-            memcpy(&cache2[caddr.index][i].block[caddr.block_offset], &data, len);
-            cache2[caddr.index][i].block[caddr.offset].dirty = 1;
+            if(caddr.block_offset + len <= BLOCK_SIZE){
+                memcpy(&cache2[caddr.index][i].block[caddr.block_offset], &data, len);
+                cache2[caddr.index][i].dirty = 1;
+            }
             else{
-                //Log("I am unaligned!(cache write)\n");
+                //Log("I am unaligned!(cache2 write)\n");
                 uint32_t len2 = caddr.block_offset + len - BLOCK_SIZE;
                 uint32_t len1 = len - len2;
                 int j = 0;
@@ -140,7 +143,7 @@ void cache2_write(hwaddr_t addr, size_t len, uint32_t data){
                 }
                 cache2_write(addr + len1, len2, data>>(len1*8));
             }
-            break;
+        return;
         }
     }
     // miss: find the block to replace
@@ -162,9 +165,9 @@ void cache2_write(hwaddr_t addr, size_t len, uint32_t data){
     for(j = 0; j < BLOCK_SIZE; ++j){
         cache2[caddr.index][i].block[j] = dram_read(tmpaddr.addr + j, 1); 
     }
-    // write again
-    memcpy(&cache2[caddr.index][i].block[caddr.offset], len, data);
-    cache2[caddr.index][i].block[caddr.offset].dirty = 1;
+    // write
+    memcpy(&cache2[caddr.index][i].block[caddr.block_offset],&data, len);
+    cache2[caddr.index][i].dirty = 1;
 }
 
 void cache2_debug(hwaddr_t addr){
@@ -180,7 +183,7 @@ void cache2_debug(hwaddr_t addr){
             printf("value at address 0x%08x is 0x%02x\n", addr, tmp);
             cache2_addr tmpaddr = caddr;
             tmpaddr.block_offset = 0;
-            printf("cache block: begin at address %08x\n", tmpaddr.addr);
+            printf("cache2 block: begin at address %08x\n", tmpaddr.addr);
             int j = 0;
             for(j = 0; j < BLOCK_SIZE; ++j){
                 printf("%02x ", cache2[caddr.index][i].block[j]);
@@ -196,3 +199,12 @@ void cache2_debug(hwaddr_t addr){
             printf("cache2[0x%x][0x%x]: valid:%d, dirty:%d, tag:0x%x\n", caddr.index, i,cache2[caddr.index][i].valid,cache2[caddr.index][i].dirty, cache2[caddr.index][i].tag);
     }
 }
+#undef ADDRESS_BITS
+#undef BLOCK_OFFSET_BITS
+#undef CACHE_SIZE
+#undef WAY_NUM
+#undef CACHE_INDEX_BITS
+#undef BLOCK_SIZE
+#undef BLOCK_NUM
+#undef GROUP_NU
+#undef CACHE_TAG_BITS
