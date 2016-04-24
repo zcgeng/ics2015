@@ -34,3 +34,13 @@ make_helper(cld){
 	cpu.DF = 0;
 	return 1;
 }
+
+make_helper(lgdt){
+	ModR_M m;
+	m.val = instr_fetch(eip + 1, 1);
+	int len = load_addr(eip + 1, &m, op_src);
+	cpu.gdtr.limit = swaddr_read(op_src->addr, 2);
+	cpu.gdtr.base = swaddr_read(op_src->addr+2, 4);
+	print_asm("lgdt seg_limit:%2x, base_addr:%x", cpu.gdtr.seg_limit, cpu.gdtr.base_addr);
+	return 1 + len;
+}
