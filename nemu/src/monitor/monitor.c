@@ -15,6 +15,15 @@ void init_cache2();
 
 FILE *log_fp = NULL;
 
+static void init_cr0(){
+	cpu.cr0.protect_enable = 0;
+}
+
+static void init_caches(){
+	init_cache();
+	init_cache2();
+}
+
 static void init_log() {
 	log_fp = fopen("log.txt", "w");
 	Assert(log_fp, "Can not open 'log.txt'");
@@ -90,12 +99,13 @@ void restart() {
 	cpu.eip = ENTRY_START;
 
 	/* Initialize cache */
-	init_cache();
-	init_cache2();
+	init_caches();
 
 	/* Initialize DRAM. */
 	init_ddr3();
 
-    /* Initialize EFLAGS */
-    cpu.eflags = 0x00000002;
+	/* Initialize registers */
+	cpu.eflags = 0x00000002;
+	
+	init_cr0();
 }
