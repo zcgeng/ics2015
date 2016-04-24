@@ -5,7 +5,7 @@ void load_sreg(uint32_t sreg) {
 	uint8_t tmp[8]; 
 	int i;
 	uint32_t base, limit;
-	for(i = 0; i < 8; ++ i) 
+	for(i = 0; i < 8; ++ i)
 		tmp[i] = lnaddr_read(cpu.gdtr.base + cpu.SR[sreg].index * 8 + i, 1);
 	SegDesc *segdesc = (SegDesc*)tmp;
 	limit = (segdesc->limit_19_16 << 16) + segdesc->limit_15_0;

@@ -16,12 +16,12 @@ void init_cache2();
 FILE *log_fp = NULL;
 
 static void init_seg(){
-	cpu.cr0.protect_enable = 0;
-	cpu.SR_cache[R_CS].base = 0;
-	cpu.SR_cache[R_CS].limit = 0xffffffff;
 	int i;
 	for(i = 0; i < 4; ++i)
 		cpu.SR_cache[i].valid = 0;
+	cpu.cr0.protect_enable = 0;
+	cpu.SR_cache[R_CS].base = 0;
+	cpu.SR_cache[R_CS].limit = 0xffffffff;
 }
 
 static void init_caches(){

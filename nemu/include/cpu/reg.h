@@ -77,7 +77,7 @@ typedef struct {
 	
 	union{
 		SELECTOR SR[4];
-		uint16_t es, cs, ss, ds;
+		struct{uint16_t es, cs, ss, ds;};
 	};
 
 	struct {
