@@ -15,8 +15,13 @@ void init_cache2();
 
 FILE *log_fp = NULL;
 
-static void init_cr0(){
+static void init_seg(){
 	cpu.cr0.protect_enable = 0;
+	cpu.SR_cache[R_CS].base = 0;
+	cpu.SR_cache[R_CS].limit = 0xffffffff;
+	int i;
+	for(i = 0; i < 4; ++i)
+		cpu.SR_cache[i].valid = 0;
 }
 
 static void init_caches(){
@@ -107,5 +112,5 @@ void restart() {
 	/* Initialize registers */
 	cpu.eflags = 0x00000002;
 	
-	init_cr0();
+	init_seg();
 }
