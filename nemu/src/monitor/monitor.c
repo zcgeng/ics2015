@@ -19,6 +19,7 @@ static void init_seg(){
 	int i;
 	for(i = 0; i < 4; ++i)
 		cpu.SR_cache[i].valid = 0;
+	cpu.cs = 8;
 	cpu.cr0.val = 0;
 	cpu.SR_cache[R_CS].base = 0;
 	cpu.SR_cache[R_CS].limit = 0xffffffff;

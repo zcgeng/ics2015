@@ -5,8 +5,12 @@ void load_sreg(uint32_t sreg) {
 	uint8_t tmp[8]; 
 	int i;
 	uint32_t base, limit;
-	for(i = 0; i < 8; ++ i)
+	//printf("%d, 0x%x\n", sreg, cpu.SR[sreg].index);
+	for(i = 0; i < 8; ++ i){
 		tmp[i] = lnaddr_read(cpu.gdtr.base + cpu.SR[sreg].index * 8 + i, 1);
+		//printf("%d ", tmp[i]);
+	}
+	//printf("\n");
 	SegDesc *segdesc = (SegDesc*)tmp;
 	limit = (segdesc->limit_19_16 << 16) + segdesc->limit_15_0;
 	base = (segdesc->base_31_24 << 24) + (segdesc->base_23_16 << 16) + segdesc->base_15_0;
@@ -18,7 +22,7 @@ void load_sreg(uint32_t sreg) {
 	cpu.SR_cache[sreg].dpl = segdesc->privilege_level;
 }
 
-lnaddr_t seg_translate(swaddr_t addr, size_t len, uint8_t sreg) {
+lnaddr_t seg_translate(swaddr_t addr, uint8_t sreg) {
 	if (cpu.cr0.protect_enable == 0) return addr;
 	uint32_t base;
 	if(cpu.SR_cache[sreg].valid == 0) load_sreg(sreg);
