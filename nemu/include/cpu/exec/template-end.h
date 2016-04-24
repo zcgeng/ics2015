@@ -4,6 +4,7 @@
 
 #undef REG
 #undef REG_NAME
+#undef SREG_NAME
 
 #undef MEM_R
 #undef MEM_W
