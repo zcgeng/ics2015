@@ -3,7 +3,7 @@
 #define instr ret
 
 static void do_execute() {
-	cpu.eip = swaddr_read(cpu.esp, 4);
+	cpu.eip = swaddr_read(cpu.esp, 4, R_SS);
 	cpu.esp += 4;
 	cpu.eip -= (1 + DATA_BYTE);
 	cpu.esp += op_src->val;

@@ -336,7 +336,7 @@ int eval(int p, int q, bool *success){
                 }
                 else return val1 % val2;
             case MINUS: return -val1;
-            case DEREF: return swaddr_read(val1,4);
+            case DEREF: return swaddr_read(val1, 4, R_DS);
             case '!' : return !val1;
             case AND : return val1 && val2;
             case OR : return val1 || val2;

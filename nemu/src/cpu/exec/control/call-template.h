@@ -5,14 +5,14 @@
 static void do_execute() {
 	cpu.esp -= 4;
 	if(op_src->type == OP_TYPE_IMM){
-		swaddr_write(cpu.esp, 4, cpu.eip + DATA_BYTE + 1);// PUSH 返回地址
+		swaddr_write(cpu.esp, 4, cpu.eip + DATA_BYTE + 1, R_SS);// PUSH 返回地址
 		cpu.eip += op_src->val;
 		if(DATA_BYTE == 2) cpu.eip &= 0x0000ffff;
    		 print_asm("call $0x%x", cpu.eip + DATA_BYTE + 1);
 	}
 	else{
 		//Log("1now eip = 0x%x, esp = 0x%x\n", cpu.eip, cpu.esp);
-		swaddr_write(cpu.esp, 4, cpu.eip + 2);
+		swaddr_write(cpu.esp, 4, cpu.eip + 2, R_SS);
 		cpu.eip = (op_src->val) - 2;
 		//Log("2now eip = 0x%x\n", cpu.eip);
 		print_asm("call $0x%x", cpu.eip + 2);

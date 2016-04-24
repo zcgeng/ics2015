@@ -192,13 +192,13 @@ static int cmd_bt(char *args){
         printf("#%02d  %08x in %s(",i++, addr, name);
         for(j = 2; j < 6; ++j){
             if(tmp + j * 4 > 0 && tmp + j * 4 < 0x8000000)
-                printf("%d, ", swaddr_read(tmp + j*4, 4));
+                printf("%d, ", swaddr_read(tmp + j*4, 4, R_SS));
         }
         if(tmp + j * 4 > 0 && tmp + j * 4 < 0x8000000)
-            printf("%d", swaddr_read(tmp + j * 4, 4));
+            printf("%d", swaddr_read(tmp + j * 4, 4, R_SS));
         printf(")\n");
-        addr = swaddr_read(tmp + 4, 4);
-        tmp = swaddr_read(tmp, 4);
+        addr = swaddr_read(tmp + 4, 4, R_SS);
+        tmp = swaddr_read(tmp, 4, R_SS);
     }
     return 0;
 }

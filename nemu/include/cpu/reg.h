@@ -15,6 +15,16 @@ enum { R_ES, R_CS, R_SS, R_DS };
  * For more details about the register encoding scheme, see i386 manual.
  */
 
+typedef union{
+	struct 
+	{
+		uint16_t rpl	:2;
+		uint16_t ti	:1;
+		uint16_t index 	:13;
+	};
+	uint16_t val;
+}SELECTOR;
+
 typedef struct {
 	union {
 		uint32_t _32;
@@ -66,16 +76,16 @@ typedef struct {
 	}gdtr;
 	
 	union{
-		union{
-			struct {
-				unsigned RPL   : 2;
-				unsigned TI    : 1;
-				unsigned INDEX : 13;
-			};
-			uint16_t _16;
-		}SR[4];
-		uint16_t cs, ds, es, ss;
+		SELECTOR SR[4];
+		uint16_t es, cs, ss, ds;
 	};
+
+	struct {
+		bool valid;
+		uint32_t base;
+		uint32_t limit;
+		uint32_t dpl : 2;
+	} SR_cache[4];
 
 } CPU_state;
 
@@ -93,5 +103,6 @@ static inline int check_reg_index(int index) {
 extern const char* regsl[];
 extern const char* regsw[];
 extern const char* regsb[];
+extern const char* sr[];
 
 #endif
