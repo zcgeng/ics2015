@@ -20,19 +20,3 @@ make_helper_v(mov_r2rm)
 make_helper_v(mov_rm2r)
 make_helper_v(mov_a2moffs)
 make_helper_v(mov_moffs2a)
-
-make_helper(mov_cr2r){
-	decode_r_l(eip + 1);
-	// uint8_t opcode = instr_fetch(cpu.eip + 1, 1);
-	write_operand_l(op_src, cpu.cr0.val);
-	print_asm("mov %%cr0, %s", op_src->str);
-	return 2;
-}
-
-make_helper(mov_r2cr){
-	decode_r_l(eip + 1);
-	// uint8_t opcode = instr_fetch(cpu.eip + 1, 1);
-	cpu.cr0.val = op_src->val;
-	print_asm("mov %s, %%cr0", op_src->str);
-	return 2;
-}
