@@ -5,6 +5,7 @@ void dram_write(hwaddr_t, size_t, uint32_t);
 uint32_t cache_read(hwaddr_t, size_t);
 void cache_write(hwaddr_t, size_t, uint32_t);
 lnaddr_t seg_translate(swaddr_t addr, uint8_t sreg);
+hwaddr_t page_translate(lnaddr_t addr);
 
 /* Memory accessing interfaces */
 void cache2_debug(hwaddr_t addr);
@@ -39,7 +40,7 @@ void lnaddr_write(lnaddr_t addr, size_t len, uint32_t data) {
 	}
 	else {
 		hwaddr_t hwaddr = page_translate(addr);
-		return hwaddr_read(hwaddr, len);
+		hwaddr_write(hwaddr, len, data);
 	}
 }
 

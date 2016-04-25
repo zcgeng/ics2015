@@ -1,4 +1,4 @@
-#include "common.h"
+#include "nemu.h"
 
 typedef union {
 	struct {
@@ -18,7 +18,7 @@ hwaddr_t page_translate(lnaddr_t addr) {
 
 	// first level page table - page directory entry
 	PDE dir_entry;
-	dir_entry = hwaddr_read((cpu.cr3.page_directory_base << 12) + 4 * lnaddr.dir, 4);
+	dir_entry.val = hwaddr_read((cpu.cr3.page_directory_base << 12) + 4 * lnaddr.dir, 4);
 	Assert(dir_entry.present == 1, "dir_entry is not valid!  addr = 0x%x, dir = 0x%x", addr, lnaddr.dir);
 
 	// second level page table - page table entry
@@ -27,5 +27,5 @@ hwaddr_t page_translate(lnaddr_t addr) {
 	Assert(page_table_entry.present == 1, "page_table_entry is not valid!  addr = 0x%x, page_frame = 0x%x, page_table_entry = 0x%x", 
 			addr, dir_entry.page_frame, page_table_entry.val);
 
-	return (page_table_entry.page_frame << 12 + addr);
+	return (page_table_entry.page_frame << 12) + addr;
 }
