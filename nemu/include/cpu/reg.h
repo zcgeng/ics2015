@@ -69,6 +69,7 @@ typedef struct {
     };
 
 	CR0 cr0;
+	CR3 cr3;
 
 	struct GDTR{
 		uint32_t base;
