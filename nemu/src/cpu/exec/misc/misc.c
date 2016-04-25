@@ -44,3 +44,9 @@ make_helper(lgdt){
 	print_asm("lgdt seg_limit:%2x, base_addr:%x", cpu.gdtr.limit, cpu.gdtr.base);
 	return 1 + len;
 }
+
+make_helper(std){
+	cpu.DF = 1;
+	print_asm("std");
+	return 1;
+}
