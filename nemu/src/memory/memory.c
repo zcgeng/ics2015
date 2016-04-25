@@ -1,4 +1,4 @@
-#include "common.h"
+#include "nemu.h"
 
 uint32_t dram_read(hwaddr_t, size_t);
 void dram_write(hwaddr_t, size_t, uint32_t);
@@ -22,6 +22,7 @@ void hwaddr_write(hwaddr_t addr, size_t len, uint32_t data) {
 
 uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 	assert(len == 1 || len == 2 || len == 4);
+	if(cpu.cr0.paging == 0) return hwaddr_read(addr, len);
 	if (((addr + len) & 0xfffff000) != (addr & 0xfffff000)) {
 		/* this is a special case, you can handle it later. */
 		panic("data cross the page boundary!\n");
@@ -34,6 +35,7 @@ uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 
 void lnaddr_write(lnaddr_t addr, size_t len, uint32_t data) {
 	assert(len == 1 || len == 2 || len == 4);
+	if(cpu.cr0.paging == 0) return hwaddr_write(addr, len, data);
 	if (((addr + len) & 0xfffff000) != (addr & 0xfffff000)) {
 		/* this is a special case, you can handle it later. */
 		panic("data cross the page boundary!\n");
