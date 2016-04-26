@@ -32,7 +32,6 @@ uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 		return hwaddr_read(hwaddr, 0x1000 - off) + (hwaddr_read(hwaddr2, len - 0x1000 + off) << ((0x1000 - off) * 8));
 	}
 	else {
-		if(addr == 0x80000001) assert(0);
 		hwaddr_t hwaddr = page_translate(addr);
 		return hwaddr_read(hwaddr, len);
 	}
