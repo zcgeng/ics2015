@@ -28,7 +28,6 @@ uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 		panic("data cross the page boundary!\n");
 	}
 	else {
-		Log("page lnaddr read : addr = 0x%x", addr);
 		if(addr == 0x80000001) assert(0);
 		hwaddr_t hwaddr = page_translate(addr);
 		return hwaddr_read(hwaddr, len);
