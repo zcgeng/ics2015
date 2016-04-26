@@ -25,7 +25,11 @@ uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 	if(cpu.cr0.paging == 0) return hwaddr_read(addr, len);
 	if (((addr + len) & 0xfffff000) != (addr & 0xfffff000)) {
 		/* this is a special case, you can handle it later. */
-		panic("data cross the page boundary!\n");
+		uint32_t off = addr & 0xfff;
+		hwaddr_t hwaddr2;
+		hwaddr_t hwaddr = page_translate(addr);
+		hwaddr2 = page_translate(addr + 0x1000 - off);
+		return hwaddr_read(hwaddr, 0x1000 - off) + (hwaddr_read(hwaddr2, len - 0x1000 + off) << ((0x1000 - off) * 8));
 	}
 	else {
 		if(addr == 0x80000001) assert(0);
