@@ -9,7 +9,6 @@ typedef union {
 	uint32_t val;
 } line_addr;
 
-#define limit 4096
 uint32_t hwaddr_read(hwaddr_t, size_t);
 
 hwaddr_t page_translate(lnaddr_t addr) {
@@ -18,7 +17,7 @@ hwaddr_t page_translate(lnaddr_t addr) {
 
 	// first level page table - page directory entry
 	PDE dir_entry;
-	Log("0x%x", (cpu.cr3.page_directory_base << 12) + 4 * lnaddr.dir);
+	Log("addr = 0x%x, dir = 0x%x", addr, lnaddr.dir);
 	dir_entry.val = hwaddr_read((cpu.cr3.page_directory_base << 12) + 4 * lnaddr.dir, 4);
 	Assert(dir_entry.present == 1, "dir_entry is not valid!  addr = 0x%x, dir = 0x%x", addr, lnaddr.dir);
 
