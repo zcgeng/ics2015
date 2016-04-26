@@ -54,6 +54,7 @@ uint32_t swaddr_read(swaddr_t addr, size_t len, uint8_t sreg) {
 #endif
 	//return lnaddr_read(addr, len);
 	lnaddr_t lnaddr = seg_translate(addr, sreg);
+	Log("lnaddr_read(lnaddr = 0x%x, len = %d) = 0x%x", lnaddr, (int)len, lnaddr_read(lnaddr, len));
 	return lnaddr_read(lnaddr, len);
 }
 
