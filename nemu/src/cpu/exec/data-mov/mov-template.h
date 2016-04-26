@@ -39,7 +39,7 @@ make_helper(concat(mov_rm2s_, SUFFIX)) {
 
 make_helper(concat(mov_r2cr_, SUFFIX)) {
 	uint8_t r = instr_fetch(eip + 1, 1);
-	if((r >> 3) & 0x7 == 0)
+	if(((r >> 3) & 0x7) == 0)
 		cpu.cr0.val = REG(r & 0x7);
 	else 
 		cpu.cr3.val = REG(r & 0x7);
@@ -49,7 +49,7 @@ make_helper(concat(mov_r2cr_, SUFFIX)) {
 
 make_helper(concat(mov_cr2r_, SUFFIX)) {
 	uint8_t r = instr_fetch(eip + 1, 1);
-	if((r >> 3) & 0x7 == 0)
+	if(((r >> 3) & 0x7) == 0)
 		REG(r & 0x7) = cpu.cr0.val;
 	else
 		REG(r & 0x7) = cpu.cr3.val;
