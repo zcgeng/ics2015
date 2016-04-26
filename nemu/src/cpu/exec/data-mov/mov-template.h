@@ -39,14 +39,20 @@ make_helper(concat(mov_rm2s_, SUFFIX)) {
 
 make_helper(concat(mov_r2cr_, SUFFIX)) {
 	uint8_t r = instr_fetch(eip + 1, 1);
-	cpu.cr0.val = REG(r & 0x7);
+	if((r >> 3) & 0x7 == 0)
+		cpu.cr0.val = REG(r & 0x7);
+	else 
+		cpu.cr3.val = REG(r & 0x7);
 	print_asm("mov" str(SUFFIX) " %%%s,%%cr%d", REG_NAME(r & 0x7), (r >> 3) & 0x7);
 	return 2;
 }
 
 make_helper(concat(mov_cr2r_, SUFFIX)) {
 	uint8_t r = instr_fetch(eip + 1, 1);
-	REG(r & 0x7) = cpu.cr0.val;
+	if((r >> 3) & 0x7 == 0)
+		REG(r & 0x7) = cpu.cr0.val;
+	else
+		REG(r & 0x7) = cpu.cr3.val;
 	print_asm("mov" str(SUFFIX) " %%cr%d,%%%s", (r >> 3) & 0x7, REG_NAME(r & 0x7));
 	return 2;
 }
