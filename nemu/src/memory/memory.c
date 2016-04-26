@@ -24,7 +24,6 @@ uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 	assert(len == 1 || len == 2 || len == 4);
 	if(cpu.cr0.paging == 0) return hwaddr_read(addr, len);
 	if (((addr + len) & 0xfffff000) != (addr & 0xfffff000)) {
-		/* this is a special case, you can handle it later. */
 		uint32_t off = addr & 0xfff;
 		hwaddr_t hwaddr2;
 		hwaddr_t hwaddr = page_translate(addr);
@@ -43,7 +42,7 @@ void lnaddr_write(lnaddr_t addr, size_t len, uint32_t data) {
 	if(cpu.cr0.paging == 0) return hwaddr_write(addr, len, data);
 	if (((addr + len) & 0xfffff000) != (addr & 0xfffff000)) {
 		/* this is a special case, you can handle it later. */
-		panic("data cross the page boundary!\n");
+		//panic("data cross the page boundary!\n");
 	}
 	else {
 		hwaddr_t hwaddr = page_translate(addr);
