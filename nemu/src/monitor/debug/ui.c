@@ -203,6 +203,25 @@ static int cmd_bt(char *args){
     return 0;
 }
 
+void page_debug(lnaddr_t);
+lnaddr_t seg_translate(swaddr_t addr, uint8_t sreg);
+static int cmd_page(char *args){
+    if(args == NULL){
+        printf("Please input a number!\n");
+        return 0;
+    }
+    char expre[32];
+    sscanf(args, "%s", expre);
+    swaddr_t addr = 0;
+    bool success = true;
+    addr = expr(expre, &success);
+    if(success == false) return 0;
+    lnaddr_t lnaddr = seg_translate(addr, R_SS);
+    printf("lnaddr = 0x%x\n", lnaddr);
+    page_debug(lnaddr);
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -220,7 +239,8 @@ static struct {
     { "w", "w EXPR : create a watchpoint of an expression, when the value changed, the program will stop.", cmd_w },
     { "d", "d NO : delete the watchpoint which has number NO.", cmd_d },
     { "bt", "print backtrace of all stack frames.", cmd_bt },
-    { "cache", "cache ADDR ---test whether the ADDR is in the cache, without changing the cache", cmd_cache }
+    { "cache", "cache ADDR ---test whether the ADDR is in the cache, without changing the cache", cmd_cache },
+    { "page", "page swaddr", cmd_page}
 	/* TODO: Add more commands */
 
 };
