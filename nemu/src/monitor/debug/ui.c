@@ -89,6 +89,7 @@ static int cmd_info(char *args) {
     return 0;
 }
 
+uint32_t dram_read(hwaddr_t, size_t);
 static int cmd_x(char* args){
     //扫描内存 
     int n;
@@ -106,10 +107,10 @@ static int cmd_x(char* args){
     if(!success) return 0;
     int i;
     for(i = 0;i < n; ++i){
-        printf("%x:\t\n",address);
+        printf("%x:\t",address);
         int j;
         for(j = 0;j < 4; ++j){
-            uint8_t memory = hwaddr_read(address, 8);
+            uint8_t memory = dram_read(address, 8);
             printf("%02x ",memory);
             address += 1;
         }
