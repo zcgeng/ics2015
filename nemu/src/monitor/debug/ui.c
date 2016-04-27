@@ -104,7 +104,7 @@ static int cmd_x(char* args){
     bool success = true;
     address = expr(expre, &success);
     if(!success) return 0;
-    
+    printf("%x:\n",address);
     int i;
     for(i = 0;i < n; ++i){
         printf("%x:\t",address);
