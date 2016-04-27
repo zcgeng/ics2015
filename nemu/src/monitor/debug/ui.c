@@ -91,7 +91,7 @@ static int cmd_info(char *args) {
 
 static int cmd_x(char* args){
     //扫描内存 
-    int n, address;
+    int n;
     char expre[32];
     if(args == NULL){
         printf("please input arguments\ntype 'help' to get more informations\n");
@@ -102,9 +102,8 @@ static int cmd_x(char* args){
         return 0;
     }
     bool success = true;
-    address = expr(expre, &success);
+    hwaddr_t address = expr(expre, &success);
     if(!success) return 0;
-    printf("%x:\n",address);
     int i;
     for(i = 0;i < n; ++i){
         printf("%x:\t",address);
