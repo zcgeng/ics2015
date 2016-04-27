@@ -106,7 +106,7 @@ static int cmd_x(char* args){
     if(!success) return 0;
     int i;
     for(i = 0;i < n; ++i){
-        printf("%x:\t",address);
+        printf("%x:\t\n",address);
         int j;
         for(j = 0;j < 4; ++j){
             uint8_t memory = hwaddr_read(address, 8);
