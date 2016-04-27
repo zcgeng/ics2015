@@ -40,7 +40,6 @@ uint32_t loader() {
 	ph = (Elf32_Phdr *)(buf + elf->e_phoff);
 	uint16_t i = 0;
 	for(i = 0; i < elf->e_phnum; ++i) {
-		set_bp();
 		//if(elf->e_phnum == 3) {HIT_BAD_TRAP;}
 		/* Scan the program header table, load each segment into memory */
 		if(ph->p_type == PT_LOAD) {
