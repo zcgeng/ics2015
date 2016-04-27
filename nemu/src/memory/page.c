@@ -36,11 +36,6 @@ void page_debug(lnaddr_t addr){
 	printf("cr3.page_directory_base = 0x%x, dir_entry_addr = 0x%x\n", cpu.cr3.page_directory_base, (cpu.cr3.page_directory_base << 12) + 4 * lnaddr.dir);
 	printf("---------------page directory---------------\n");
 	PDE dir_entry;
-	int i = 0;
-	while(i < 1000){
-		dir_entry.val = hwaddr_read((cpu.cr3.page_directory_base << 12) + i * 4, 4);
-		if(dir_entry.present == 0) continue;
-		printf("0x%x:\tpage_frame = 0x%x\n", (cpu.cr3.page_directory_base << 12)+i*4, dir_entry.page_frame);
-		i++;
-	}
+	dir_entry.val = hwaddr_read((cpu.cr3.page_directory_base << 12) + lnaddr.dir * 4, 4);
+	printf("page directory: page_frame = 0x%x\n", dir_entry.page_frame);
 }
