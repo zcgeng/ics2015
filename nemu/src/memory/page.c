@@ -33,9 +33,15 @@ hwaddr_t page_translate(lnaddr_t addr) {
 void page_debug(lnaddr_t addr){
 	line_addr lnaddr;
 	lnaddr.val = addr;
+	printf("lnaddr = 0x%x, dir = 0x%x, page = 0x%x, offset = 0x%x\n", lnaddr.val, lnaddr.dir, lnaddr.page, lnaddr.offset);
 	printf("cr3.page_directory_base = 0x%x, dir_entry_addr = 0x%x\n", cpu.cr3.page_directory_base, (cpu.cr3.page_directory_base << 12) + 4 * lnaddr.dir);
-	printf("---------------page directory---------------\n");
 	PDE dir_entry;
 	dir_entry.val = hwaddr_read((cpu.cr3.page_directory_base << 12) + lnaddr.dir * 4, 4);
-	printf("page directory: page_frame = 0x%x\n", dir_entry.page_frame);
+	printf("page directory: present = %x, page_frame << 12 = 0x%x\n", dir_entry.present, dir_entry.page_frame<<12);
+
+	PTE page_table_entry;
+	page_table_entry.val = hwaddr_read((dir_entry.page_frame << 12) + 4 * lnaddr.page, 4);
+	printf("page table item: present = %x, page_frame << 12 = 0x%x\n", page_table_entry.present, page_table_entry.page_frame<<12);
+
+	printf("--->hwaddr = 0x%x\n",  (page_table_entry.page_frame << 12) + lnaddr.offset);
 }
