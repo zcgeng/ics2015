@@ -11,7 +11,7 @@ typedef union {
 
 uint32_t hwaddr_read(hwaddr_t, size_t);
 
-hwaddr_t page_translate(lnaddr_t addr) {
+PTE page_read(lnaddr_t addr){
 	line_addr lnaddr;
 	lnaddr.val = addr;
 
@@ -26,8 +26,18 @@ hwaddr_t page_translate(lnaddr_t addr) {
 	page_table_entry.val = hwaddr_read((dir_entry.page_frame << 12) + 4 * lnaddr.page, 4);
 	Assert(page_table_entry.present == 1, "page_table_entry is not valid!  addr = 0x%x, page_frame = 0x%x, page_table_entry = 0x%x", 
 			addr, dir_entry.page_frame, page_table_entry.val);
+	return page_table_entry;
+}
 
-	return (page_table_entry.page_frame << 12) + lnaddr.offset;
+void init_tlb();
+hwaddr_t tlb_read(lnaddr_t addr);
+uint32_t this_cr3;
+hwaddr_t page_translate(lnaddr_t addr) {
+	if(this_cr3 != cpu.cr3.val) {
+		init_tlb();
+		this_cr3 = cpu.cr3.val;
+	}
+	return tlb_read(addr);
 }
 
 void page_debug(lnaddr_t addr){
