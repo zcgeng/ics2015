@@ -12,6 +12,7 @@ void init_wp_list();
 void init_ddr3();
 void init_cache();
 void init_cache2();
+void init_tlb();
 
 FILE *log_fp = NULL;
 
@@ -28,6 +29,7 @@ static void init_seg(){
 static void init_caches(){
 	init_cache();
 	init_cache2();
+	init_tlb();
 }
 
 static void init_log() {
