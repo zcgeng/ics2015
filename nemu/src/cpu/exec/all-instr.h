@@ -23,6 +23,7 @@
 
 #include "control/call.h"
 #include "control/leave.h"
+#include "control/int.h"
 #include "control/jcc.h"
 #include "control/jmp.h"
 #include "control/ret.h"
