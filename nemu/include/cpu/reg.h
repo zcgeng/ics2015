@@ -70,6 +70,11 @@ typedef struct {
 
 	CR0 cr0;
 	CR3 cr3;
+	
+	struct IDTR{
+		uint32_t base;
+		uint16_t limit;
+	}idtr;
 
 	struct GDTR{
 		uint32_t base;

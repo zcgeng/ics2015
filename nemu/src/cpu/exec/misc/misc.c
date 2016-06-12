@@ -45,6 +45,16 @@ make_helper(lgdt){
 	return 1 + len;
 }
 
+make_helper(lidt){
+	ModR_M m;
+	m.val = instr_fetch(eip + 1, 1);
+	int len = load_addr(eip + 1, &m, op_src);
+	cpu.idtr.limit = lnaddr_read(op_src->addr, 2);
+	cpu.idtr.base = lnaddr_read(op_src->addr+2, 4);
+	print_asm("lidt seg_limit:%2x, base_addr:%x", cpu.idtr.limit, cpu.idtr.base);
+	return 1 + len;
+}
+
 make_helper(std){
 	cpu.DF = 1;
 	print_asm("std");
