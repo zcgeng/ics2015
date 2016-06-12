@@ -5,7 +5,7 @@ void raise_intr(uint8_t NO);
 
 static void do_execute() {
 	print_asm_template1();
-	Log("%d", cpu.eip);
+	//Log("%d", cpu.eip);
 	int len = DATA_BYTE + 1;
 	cpu.eip += len;
 	raise_intr(op_src->val);
