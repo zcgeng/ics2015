@@ -15,7 +15,7 @@ static void do_execute(){
 		}
 //		printf("%d %x\n", i, cpu.gpr[i]._32);
 	}
-	print_asm_template1();
+	print_asm("pusha");
 }
 
 make_instr_helper(r)
