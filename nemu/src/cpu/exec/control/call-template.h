@@ -12,10 +12,12 @@ static void do_execute() {
    		print_asm_template1();
 	}
 	else{
-		//Log("1now eip = 0x%x, esp = 0x%x\n", cpu.eip, cpu.esp);
-		swaddr_write(cpu.esp, 4, cpu.eip + 2, R_SS);
-		cpu.eip = (op_src->val) - 2;
-		//Log("2now eip = 0x%x\n", cpu.eip);
+		//Log("1now eip = 0x%x, esp = 0x%x", cpu.eip, cpu.esp);
+		int len = get_len() + 1;
+		swaddr_write(cpu.esp, 4, cpu.eip + len, R_SS);
+		cpu.eip = (op_src->val) - len;
+		//Log("len = 0x%x", len);
+		//Log("2now eip = 0x%x", cpu.eip);
 		print_asm_template1();
 	}	
 
