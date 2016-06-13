@@ -42,6 +42,12 @@ make_helper(cli){
 	return 1;
 }
 
+make_helper(sti){
+	cpu.IF = 1;
+	print_asm("sti");
+	return 1;
+}
+
 make_helper(lgdt){
 	ModR_M m;
 	m.val = instr_fetch(eip + 1, 1);
