@@ -1,9 +1,11 @@
 #include "prefix/prefix.h"
 
-#include "data-mov/mov.h"
 #include "data-mov/cmovcc.h"
+#include "data-mov/in.h"
+#include "data-mov/mov.h"
 #include "data-mov/movsx.h"
 #include "data-mov/movzx.h"
+#include "data-mov/out.h"
 #include "data-mov/push.h"
 #include "data-mov/pusha.h"
 #include "data-mov/pop.h"
