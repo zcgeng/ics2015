@@ -27,6 +27,7 @@
 
 #include "control/call.h"
 #include "control/leave.h"
+#include "control/hlt.h"
 #include "control/int.h"
 #include "control/iret.h"
 #include "control/jcc.h"
