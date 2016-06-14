@@ -42,7 +42,28 @@ void do_syscall(TrapFrame *tf) {
 		case SYS_write: sys_write(tf); break;
 
 		/* TODO: Add more system calls. */
-
+		case SYS_open:
+					  if(tf->ebx >= 3)tf->eax = fs_open((void *)tf->ebx , tf->ecx);
+					  //tf->eax = fs_open((void *)tf->ebx , tf->ecx);
+					  break;
+						
+		case SYS_read:
+					  if(tf->ebx >= 3)tf->eax = fs_read(tf->ebx ,(void *)tf->ecx , tf->edx);
+					  //tf->eax = fs_read(tf->ebx ,(void *)tf->ecx , tf->edx);
+					  break;
+		case SYS_lseek:
+					  if(tf->ebx >= 3)tf->eax = fs_lseek(tf->ebx , tf->ecx , tf->edx);
+					  //tf->eax = fs_lseek(tf->ebx , tf->ecx , tf->edx);
+						break;
+		case SYS_close:
+					  if(tf->ebx >= 3)tf->eax = fs_close(tf->ebx);
+					  //tf->eax = fs_close(tf->ebx);
+					  break;
+		case SYS_write: if(tf->ebx < 3)
+						  sys_write(tf);
+						else 
+						  tf->eax = fs_write(tf->ebx , (void *)tf->ecx , tf->edx);
+						break; 
 		default: panic("Unhandled system call: id = %d", tf->eax);
 	}
 }
