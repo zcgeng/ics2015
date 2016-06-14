@@ -12,5 +12,7 @@ make_helper(sti);
 make_helper(lgdt);
 make_helper(lidt);
 make_helper(std);
+make_helper(stc);
+make_helper(clc);
 
 #endif

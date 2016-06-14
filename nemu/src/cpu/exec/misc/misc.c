@@ -55,6 +55,18 @@ make_helper(sti){
 	return 1;
 }
 
+
+make_helper(clc){
+	cpu.CF = 0;
+	print_asm("clc");
+	return 1;
+}
+
+make_helper(stc){
+	cpu.CF = 1;
+	print_asm("stc");
+	return 1;
+}
 make_helper(lgdt){
 	ModR_M m;
 	m.val = instr_fetch(eip + 1, 1);
