@@ -2,6 +2,16 @@
 
 #include <sys/syscall.h>
 
+
+int fs_open(const char *pathname, int flags);
+int fs_read(int fd, void *buf, int len);
+int fs_write(int fd, void *buf, int len);
+int fs_lseek(int fd, int offset, int whence);
+int fs_close(int fd);
+
+enum { SR_ES, SR_CS , SR_SS , SR_DS };
+
+
 void add_irq_handle(int, void (*)(void));
 void mm_brk(uint32_t);
 void serial_printc(char);
@@ -39,7 +49,6 @@ void do_syscall(TrapFrame *tf) {
 			break;
 
 		case SYS_brk: sys_brk(tf); break;
-		case SYS_write: sys_write(tf); break;
 
 		/* TODO: Add more system calls. */
 		case SYS_open:
@@ -59,7 +68,7 @@ void do_syscall(TrapFrame *tf) {
 					  if(tf->ebx >= 3)tf->eax = fs_close(tf->ebx);
 					  //tf->eax = fs_close(tf->ebx);
 					  break;
-		case SYS_write: if(tf->ebx < 3)
+		case SYS_write: 		if(tf->ebx < 3)
 						  sys_write(tf);
 						else 
 						  tf->eax = fs_write(tf->ebx , (void *)tf->ecx , tf->edx);
