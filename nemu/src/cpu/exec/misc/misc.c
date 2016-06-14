@@ -30,6 +30,13 @@ make_helper(cwd){
 	return 1;
 }
 
+make_helper(cwde){
+	short ax = reg_w(R_AX);
+	cpu.eax = (int) ax;
+	print_asm("cwde");
+	return 1;
+}
+
 make_helper(cld){
 	cpu.DF = 0;
 	print_asm("cld");
