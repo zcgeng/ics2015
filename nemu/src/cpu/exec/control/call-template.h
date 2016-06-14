@@ -4,19 +4,19 @@
 
 static void do_execute() {
 	cpu.esp -= 4;
-	int len = get_len() + 1;
-	if(op_src->type == OP_TYPE_IMM){
+	int len = get_len();
 		swaddr_write(cpu.esp, 4, cpu.eip + len, R_SS);// PUSH 返回地址
+	if(op_src->type == OP_TYPE_IMM){
 		cpu.eip += op_src->val;
 		op_src->val += len;
+		snprintf(op_src->str, OP_STR_SIZE, "$0x%x", cpu.eip + len + 1);
 	}
 	else{
-		swaddr_write(cpu.esp, 4, cpu.eip + len, R_SS);
-		cpu.eip = (op_src->val) - len;
+		cpu.eip = (op_src->val) - len - 1;
 
+		print_asm_template1();
 	}	
 
-	print_asm_template1();
 }
 
 
