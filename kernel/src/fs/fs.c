@@ -5,6 +5,10 @@ typedef struct {
 	uint32_t size;
 	uint32_t disk_offset;
 } file_info;
+typedef struct {
+	bool opened;
+	uint32_t offset;
+} Fstate;
 
 enum {SEEK_SET, SEEK_CUR, SEEK_END};
 
