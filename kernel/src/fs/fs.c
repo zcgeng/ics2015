@@ -31,4 +31,69 @@ void ide_read(uint8_t *, uint32_t, uint32_t);
 void ide_write(uint8_t *, uint32_t, uint32_t);
 
 /* TODO: implement a simplified file system here. */
+bool equal(const char * a , char *b){
+	int i = 0;
+	while(a[i]){
+		if(a[i] != *b)
+		  return false;
+		i++;
+		b++;
+	}
+	if(*b)return false;
+	return true;
+}
+int fs_open(const char *pathname  , int flags) {
+	int i ; 
+	int fd;
+	for(i = 0 ; i < NR_FILES ; i++) {
+		if(equal(pathname , file_table[i].name)){
+			fd = i + 3;
+			fPool[fd].opened = true;
+			fPool[fd].offset = 0;
+			return fd;
+		}
+	}
+	Log("%s",pathname);
+	assert(0);
+	return -1; 
+}
+
+int fs_read(int fd , void *buf , int len) {
+	int file_poi = fd - 3;
+	if(fPool[fd].offset + len > file_table[file_poi].size){
+		len = file_table[file_poi].size - fPool[fd].offset;
+	}
+	if(!fPool[fd].opened)return 0;
+	ide_read(buf,file_table[file_poi].disk_offset + fPool[fd].offset , len);
+	fPool[fd].offset += len ;
+	return len;
+}
+
+int fs_write(int fd , void *buf , int len) {
+	int fPoi = fd - 3 ;
+	if(!fPool[fd].opened)return 0;
+	if(fPool[fd].offset + len > file_table[fPoi].size)
+		len = file_table[fPoi].size - fPool[fd].offset;
+	ide_write(buf , file_table[fPoi].disk_offset + fPool[fd].offset , len);
+	fPool[fd].offset += len ;
+	return len ;
+}
+
+int fs_lseek(int fd , int offset , int whence) {
+	if(!fPool[fd].opened)return -1; 
+	switch(whence) {
+		case SEEK_SET: fPool[fd].offset = offset;break;
+		case SEEK_CUR: fPool[fd].offset += offset;break;
+		case SEEK_END: fPool[fd].offset = file_table[fd - 3].size + offset;break;
+	}
+	if(fPool[fd].offset > file_table[fd-3].size){
+		fPool[fd].offset = file_table[fd - 3].size;
+	}
+	return fPool[fd].offset;
+}
+
+int fs_close(int fd){
+	fPool[fd].opened = false;
+	return 0;
+}
 
