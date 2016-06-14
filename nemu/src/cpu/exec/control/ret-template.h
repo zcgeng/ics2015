@@ -4,10 +4,12 @@
 
 static void do_execute() {
 	cpu.eip = swaddr_read(cpu.esp, 4, R_SS);
-	cpu.esp += 4;
-	cpu.eip -= (1 + DATA_BYTE);
-	cpu.esp += op_src->val;
-	print_asm("ret $0x%x", op_src->val);
+	cpu.esp = cpu.esp + 4 + op_src->val;
+	if(op_src->val == 0) print_asm("ret"); 
+	else {
+		cpu.eip -= 2;
+		print_asm_template1();
+	}
 }
 
 
