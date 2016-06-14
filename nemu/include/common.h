@@ -8,7 +8,7 @@
 
 //volatile static int dummy=0;
 
-#define DEBUG
+//#define DEBUG
 #define LOG_FILE
 
 #include "debug.h"
