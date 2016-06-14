@@ -35,6 +35,7 @@
 #include "control/ret.h"
 
 #include "logic/and.h"
+#include "logic/bt.h"
 #include "logic/or.h"
 #include "logic/test.h"
 #include "logic/not.h"
