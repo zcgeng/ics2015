@@ -31,6 +31,8 @@ static const file_info file_table[] = {
 
 #define NR_FILES (sizeof(file_table) / sizeof(file_table[0]))
 
+static Fstate fPool[NR_FILES + 3];
+
 void ide_read(uint8_t *, uint32_t, uint32_t);
 void ide_write(uint8_t *, uint32_t, uint32_t);
 
