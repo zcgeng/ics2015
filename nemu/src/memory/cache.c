@@ -4,6 +4,7 @@
 	> Mail: zcg1996@qq.com
 	> Created Time: 2016年04月05日 星期二 14时42分24秒
  ************************************************************************/
+//#define USE_CACHE
 
 #include "common.h"
 #include "stdlib.h"
@@ -23,6 +24,8 @@
 #define CACHE_TAG_BITS (ADDRESS_BITS - BLOCK_OFFSET_BITS - CACHE_INDEX_BITS)
 int32_t cache2_read(hwaddr_t, size_t);
 void cache2_write(hwaddr_t, size_t, uint32_t);
+uint32_t dram_read(hwaddr_t, size_t);
+void dram_write(hwaddr_t, size_t, uint32_t);
 
 typedef union{
     struct{
@@ -52,6 +55,10 @@ void init_cache(){
 }
 
 uint32_t cache_read(hwaddr_t addr, size_t len){
+
+#ifndef USE_CACHE
+	return dram_read(addr, len) & (~0u >> ((4 - len) << 3));
+#endif
     int i;
     cache_addr caddr;
     caddr.addr = addr;
@@ -107,6 +114,10 @@ uint32_t cache_read(hwaddr_t addr, size_t len){
 }
 
 void cache_write(hwaddr_t addr, size_t len, uint32_t data){
+#ifndef USE_CACHE
+	dram_write(addr, len, data);
+	return;
+#endif
     cache_addr caddr;
     caddr.addr = addr;
     int i;

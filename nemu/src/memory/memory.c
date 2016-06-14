@@ -34,12 +34,13 @@ uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 	assert(len == 1 || len == 2 || len == 4);
 	if(cpu.cr0.paging == 0) return hwaddr_read(addr, len);
 	if ((addr & 0xfff) + len > 0x1000) {
-		//Log("hehedadada");
 		uint32_t off = addr & 0xfff;
 		hwaddr_t hwaddr2;
 		hwaddr_t hwaddr = page_translate(addr);
 		hwaddr2 = page_translate(addr + 0x1000 - off);
-		return hwaddr_read(hwaddr, 0x1000 - off) + (hwaddr_read(hwaddr2, len - 0x1000 + off) << ((0x1000 - off) * 8));
+		uint32_t data = hwaddr_read(hwaddr, 0x1000 - off) + (hwaddr_read(hwaddr2, len - 0x1000 + off) << ((0x1000 - off) * 8));
+		//Log("read %x %d %x", addr, (int)len,  data);
+		return data;
 	}
 	else {
 		hwaddr_t hwaddr = page_translate(addr);
@@ -51,13 +52,12 @@ void lnaddr_write(lnaddr_t addr, size_t len, uint32_t data) {
 	assert(len == 1 || len == 2 || len == 4);
 	if(cpu.cr0.paging == 0) return hwaddr_write(addr, len, data);
 	if ((addr & 0xfff) + len > 0x1000) {
-		Log("heheda");
-		uint32_t off = addr & 0xfff;
-		hwaddr_t hwaddr2;
-		hwaddr_t hwaddr = page_translate(addr);
-		hwaddr2 = page_translate(addr + 0x1000 - off);
-		hwaddr_write(hwaddr, 0x1000 - off, data);
-		hwaddr_write(hwaddr2, len + off - 0x1000, data >> ((0x1000 - off) * 8));
+		//Log("write %x %d %x", addr, (int)len,  data);
+		uint8_t *data_bytes = (void *) &data;
+		int i;
+		for (i = 0; i < len; i++){
+			hwaddr_write(page_translate(addr + i), 1, data_bytes[i]);
+		}
 	}
 	else {
 		hwaddr_t hwaddr = page_translate(addr);
