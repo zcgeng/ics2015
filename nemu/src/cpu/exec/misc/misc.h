@@ -4,8 +4,6 @@
 make_helper(nop);
 make_helper(int3);
 make_helper(lea);
-make_helper(cwd);
-make_helper(cwde);
 make_helper(cld);
 make_helper(cli);
 make_helper(sti);

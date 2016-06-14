@@ -24,19 +24,6 @@ make_helper(lea) {
 	return 1 + len;
 }
 
-make_helper(cwd){
-	cpu.edx = (cpu.eax>>31 == 1 ? 0xffffffff : 0);
-	print_asm("cwd/cdq");
-	return 1;
-}
-
-make_helper(cwde){
-	short ax = reg_w(R_AX);
-	cpu.eax = (int) ax;
-	print_asm("cwde");
-	return 1;
-}
-
 make_helper(cld){
 	cpu.DF = 0;
 	print_asm("cld");

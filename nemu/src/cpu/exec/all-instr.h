@@ -1,6 +1,8 @@
 #include "prefix/prefix.h"
 
 #include "data-mov/cmovcc.h"
+#include "data-mov/cwd_cdq.h"
+#include "data-mov/cbw_cwde.h"
 #include "data-mov/in.h"
 #include "data-mov/mov.h"
 #include "data-mov/movsx.h"
