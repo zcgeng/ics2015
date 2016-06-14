@@ -3,7 +3,7 @@
 void load_sreg(uint32_t);
 
 make_helper(iret) {
-	cpu.eip = swaddr_read(cpu.esp, 4, R_SS) - 1; //函数返回后eip会增加1
+	cpu.eip = swaddr_read(cpu.esp, 4, R_SS);
 	cpu.esp += 4;
 
 	cpu.cs = swaddr_read(cpu.esp, 4, R_SS);
