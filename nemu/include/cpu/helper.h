@@ -11,8 +11,8 @@ static inline uint32_t instr_fetch(swaddr_t addr, size_t len) {
 	return swaddr_read(addr, len, R_CS);
 }
 
-static int len;
 /* Instruction Decode and EXecute */
+static int len;
 static inline int idex(swaddr_t eip, int (*decode)(swaddr_t), void (*execute) (void)) {
 	/* eip is pointing to the opcode */
 	len = decode(eip + 1);
@@ -20,7 +20,7 @@ static inline int idex(swaddr_t eip, int (*decode)(swaddr_t), void (*execute) (v
 	return len + 1;	// "1" for opcode
 }
 
-static inline int get_len(){
+static inline int get_len() {
 	return len;
 }
 

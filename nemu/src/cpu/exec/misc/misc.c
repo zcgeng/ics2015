@@ -58,9 +58,9 @@ make_helper(lgdt){
 	ModR_M m;
 	m.val = instr_fetch(eip + 1, 1);
 	int len = load_addr(eip + 1, &m, op_src);
-	cpu.gdtr.limit = lnaddr_read(op_src->addr, 2);
-	cpu.gdtr.base = lnaddr_read(op_src->addr+2, 4);
-	print_asm("lgdt seg_limit:%2x, base_addr:%x", cpu.gdtr.limit, cpu.gdtr.base);
+	cpu.GDTR.limit = lnaddr_read(op_src->addr, 2);
+	cpu.GDTR.base = lnaddr_read(op_src->addr+2, 4);
+	print_asm("lgdt seg_limit:%2x, base_addr:%x", cpu.GDTR.limit, cpu.GDTR.base);
 	return 1 + len;
 }
 
@@ -68,9 +68,9 @@ make_helper(lidt){
 	ModR_M m;
 	m.val = instr_fetch(eip + 1, 1);
 	int len = load_addr(eip + 1, &m, op_src);
-	cpu.idtr.limit = lnaddr_read(op_src->addr, 2);
-	cpu.idtr.base = lnaddr_read(op_src->addr+2, 4);
-	print_asm("lidt seg_limit:%2x, base_addr:%x", cpu.idtr.limit, cpu.idtr.base);
+	cpu.IDTR.limit = lnaddr_read(op_src->addr, 2);
+	cpu.IDTR.base = lnaddr_read(op_src->addr+2, 4);
+	print_asm("lidt seg_limit:%2x, base_addr:%x", cpu.IDTR.limit, cpu.IDTR.base);
 	return 1 + len;
 }
 
