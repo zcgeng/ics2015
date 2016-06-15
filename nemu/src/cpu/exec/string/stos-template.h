@@ -2,25 +2,17 @@
 
 #define instr stos
 
-#if DATA_BYTE == 1
-#define MASK ((uint32_t) 0xff)
-#elif DATA_BYTE == 2
-#define MASK ((uint32_t) 0xffff)
-#elif DATA_BYTE == 4
-#define MASK ((uint32_t) 0xffffffff)
-#else
-#error unknown DATA_BYTE
-#endif
-
-make_helper(concat(stos_, SUFFIX)){
-	MEM_W(cpu.edi, REG(R_EAX) & MASK, R_ES);
-	if(cpu.DF == 0) cpu.edi += DATA_BYTE;
-	else cpu.edi -= DATA_BYTE;
-	print_asm("stos" str(SUFFIX));
-	return 1;
+static void do_execute() {
+	op_src->type = op_dest->type = OP_TYPE_REG;
+	op_src->reg = R_EAX; 
+	op_dest->reg = R_EDI;
+	snprintf(op_src->str, OP_STR_SIZE, "%%%s", REG_NAME(R_EAX));
+	snprintf(op_dest->str, 11, "%%es:(%%edi)");
+	MEM_W(cpu.edi, cpu.eax, R_ES);
+	cpu.edi += eflags.DF == 0? +DATA_BYTE : -DATA_BYTE;
+	print_asm_template2();
 }
 
-#undef MASK
-
+make_instr_helper(m)
 
 #include "cpu/exec/template-end.h"

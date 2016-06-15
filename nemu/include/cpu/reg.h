@@ -67,27 +67,28 @@ typedef struct {
 	} SR_cache[4];
 	swaddr_t eip;
 	volatile bool INTR;
-
-	union {
-		struct {
-			uint32_t CF: 1;
-			uint32_t a : 1;
-			uint32_t PF: 1;
-			uint32_t b : 1;
-			uint32_t AF: 1;
-			uint32_t c : 1;
-			uint32_t ZF: 1;
-			uint32_t SF: 1;
-			uint32_t TF: 1;
-			uint32_t IF: 1;
-			uint32_t DF: 1;
-			uint32_t OF: 1;
-		};
-		uint32_t eflags;
-	};
 } CPU_state;
 
+typedef union {
+	struct {
+		unsigned CF: 1;
+		unsigned a : 1;
+		unsigned PF: 1;
+		unsigned b : 1;
+		unsigned AF: 1;
+		unsigned c : 1;
+		unsigned ZF: 1;
+		unsigned SF: 1;
+		unsigned TF: 1;
+		unsigned IF: 1;
+		unsigned DF: 1;
+		unsigned OF: 1;
+	};
+	uint32_t val;
+} CPU_flags;
+
 extern CPU_state cpu;
+extern CPU_flags eflags;
 static inline int check_reg_index(int index) {
 	assert(index >= 0 && index < 8);
 	return index;
@@ -96,11 +97,9 @@ static inline int check_reg_index(int index) {
 #define reg_l(index) (cpu.gpr[check_reg_index(index)]._32)
 #define reg_w(index) (cpu.gpr[check_reg_index(index)]._16)
 #define reg_b(index) (cpu.gpr[check_reg_index(index) & 0x3]._8[index >> 2])
-#define sreg(index) (cpu.SR[check_reg_index(index)]._16)
 
 extern const char* regsl[];
 extern const char* regsw[];
 extern const char* regsb[];
-extern const char* sr[];
 
 #endif

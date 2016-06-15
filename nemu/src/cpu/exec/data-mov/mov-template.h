@@ -28,32 +28,15 @@ make_helper(concat(mov_moffs2a_, SUFFIX)) {
 	return 5;
 }
 
-void erode_sreg(uint32_t);
 make_helper(concat(mov_rm2s_, SUFFIX)) {
-	uint8_t r = instr_fetch(eip + 1, 1);
-	sreg((r >> 3) & 0x7) = (uint16_t)REG(r & 0x7);
-	erode_sreg((r >> 3) & 0x7);
-	print_asm("mov" str(SUFFIX) " %%%s,%%%s", REG_NAME(r & 0x7), SREG_NAME((r >> 3) & 0x7));
+	uint32_t rm = instr_fetch(cpu.eip+1, 1);
+//	printf("%x\n", rm);
+
+	uint8_t reg = rm & 7;
+	uint8_t sreg = (rm >> 3) & 7;
+	cpu.SR[sreg]._16 = REG(reg);
+	print_asm("mov" str(SUFFIX) " %%%s,0x%x", REG_NAME(reg), sreg);
 	return 2;
 }
 
-make_helper(concat(mov_r2cr_, SUFFIX)) {
-	uint8_t r = instr_fetch(eip + 1, 1);
-	if(((r >> 3) & 0x7) == 0)
-		cpu.cr0.val = REG(r & 0x7);
-	else 
-		cpu.cr3.val = REG(r & 0x7);
-	print_asm("mov" str(SUFFIX) " %%%s,%%cr%d", REG_NAME(r & 0x7), (r >> 3) & 0x7);
-	return 2;
-}
-
-make_helper(concat(mov_cr2r_, SUFFIX)) {
-	uint8_t r = instr_fetch(eip + 1, 1);
-	if(((r >> 3) & 0x7) == 0)
-		REG(r & 0x7) = cpu.cr0.val;
-	else
-		REG(r & 0x7) = cpu.cr3.val;
-	print_asm("mov" str(SUFFIX) " %%cr%d,%%%s", (r >> 3) & 0x7, REG_NAME(r & 0x7));
-	return 2;
-}
 #include "cpu/exec/template-end.h"

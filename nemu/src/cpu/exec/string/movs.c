@@ -14,4 +14,5 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(movs)
+make_helper_v(movs_m);
+

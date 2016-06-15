@@ -5,7 +5,7 @@
 extern uint8_t entry [];
 extern uint32_t entry_len;
 extern char *exec_file;
-//extern CPU_flags cpu;
+//extern CPU_flags eflags;
 
 void load_elf_tables(int, char *[]);
 void init_regex();
@@ -84,10 +84,10 @@ static void load_entry() {
 	fclose(fp);
 }
 
-void init_cpu() {
-	cpu.a=1;
-	cpu.b=0;
-	cpu.c=0;
+void init_eflags() {
+	eflags.a=1;
+	eflags.b=0;
+	eflags.c=0;
 }
 
 void init_CR0() {
@@ -103,7 +103,7 @@ void init_CR0() {
 
 void restart() {
 	/* Perform some initialization to restart a program */
-	init_cpu();
+	init_eflags();
 #ifdef USE_RAMDISK
 	/* Read the file with name `argv[1]' into ramdisk. */
 	init_ramdisk();

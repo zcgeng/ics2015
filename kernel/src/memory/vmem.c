@@ -11,7 +11,7 @@ static PTE vptable[/*(VMEM_ADDR + SCR_SIZE) / PAGE_SIZE + 1*/NR_PTE] align_to_pa
 inline PDE* get_updir();
 
 void create_video_mapping() {
-	/* DONE: create an identical mapping from virtual memory area 
+	/* TODO: create an identical mapping from virtual memory area 
 	 * [0xa0000, 0xa0000 + SCR_SIZE) to physical memory area 
 	 * [0xa0000, 0xa0000 + SCR_SIZE) for user program. You may define
 	 * some page tables to create this mapping.
@@ -19,9 +19,14 @@ void create_video_mapping() {
 //	panic("please implement me");
 	PDE *pdir = get_updir();
 	PTE *ptable = /*(PTE *)va_to_pa*/(vptable + (VMEM_ADDR >> 12));
-
+/*	int pdir_idx;
+	for(pdir_idx = 0; pdir_idx < SCR_SIZE / PT_SIZE; pdir_idx ++) {
+		pdir[pdir_idx].val = make_pde(ptable);
+	}
+*/
 	pdir[0].val = make_pde(va_to_pa(ptable));
 	int pframe_addr;
+//	for(pframe_addr = 0; pframe_addr < VMEM_ADDR; pframe_addr += PAGE_SIZE) ptable ++;
 	for(pframe_addr = VMEM_ADDR; pframe_addr < VMEM_ADDR + SCR_SIZE + PAGE_SIZE; pframe_addr += PAGE_SIZE) {
 		ptable->val = make_pte(pframe_addr);
 		ptable ++;

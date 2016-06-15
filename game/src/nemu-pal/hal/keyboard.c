@@ -13,13 +13,26 @@ static const int keycode_array[] = {
 };
 
 static int key_state[NR_KEYS];
-static inline void key_ispressed(int );
+//static int l_key_state[NR_KEYS];
 
 void
 keyboard_event(void) {
-	/* DONE: Fetch the scancode and update the key states. */
-	int key_code = in_byte(0x60);
-	key_ispressed(key_code);
+	/* TODO: Fetch the scancode and update the key states. */
+	
+	uint32_t key_code = in_byte(0x60);
+	int i;
+	for(i = 0; i < NR_KEYS; i++) {
+	    if((key_code & 0x7f) == keycode_array[i]) {
+//			if(key_state[i] != l_key_state[i]) l_key_state[i] = key_state[i];
+			if(key_code & 0x80) key_state[i] = KEY_STATE_RELEASE;
+			else key_state[i] = KEY_STATE_PRESS;
+			break;
+	    }
+	}
+	
+//	printf("%x\n", key_code);
+
+//	assert(0);
 }
 
 static inline int
@@ -37,62 +50,57 @@ query_key(int index) {
 static inline void
 release_key(int index) {
 	assert(index >= 0 && index < NR_KEYS);
+//	if(key_state[index] != l_key_state[index]) l_key_state[index] = key_state[index];
 	key_state[index] = KEY_STATE_WAIT_RELEASE;
 }
 
 static inline void
 clear_key(int index) {
 	assert(index >= 0 && index < NR_KEYS);
+//	if(key_state[index] != l_key_state[index]) l_key_state[index] = key_state[index];
 	key_state[index] = KEY_STATE_EMPTY;
 }
 
 bool 
 process_keys(void (*key_press_callback)(int), void (*key_release_callback)(int)) {
 	cli();
-	/* DONE: Traverse the key states. Find a key just pressed or released.
+	/* TODO: Traverse the key states. Find a key just pressed or released.
 	 * If a pressed key is found, call ``key_press_callback'' with the keycode.
 	 * If a released key is found, call ``key_release_callback'' with the keycode.
 	 * If any such key is found, the function return true.
 	 * If no such key is found, the function return false.
 	 * Remember to enable interrupts before returning from the function.
 	 */
-	int i ,flags = 0;
-	for( i = 0; i < NR_KEYS ; i++){
-		if(query_key(i) == KEY_STATE_PRESS){
+
+//	printf("*\n");
+/*
+	uint32_t key_code = in_byte(0x60);
+	int i;
+	for(i = 0; i < NR_KEYS; i++) {
+	    if((key_code & 0x7f) == keycode_array[i]) {
+			if(key_state[i] != l_key_state[i]) l_key_state[i] = key_state[i];
+			if(key_code & 0x80) key_state[i] = KEY_STATE_RELEASE;
+			else key_state[i] = KEY_STATE_PRESS;
+			break;
+	    }
+	}
+	*/
+	int i;
+	for(i = 0; i < NR_KEYS; i++) {
+	    if(query_key(i) == KEY_STATE_PRESS /*&& l_key_state[i] != KEY_STATE_PRESS*/) {
+//			printf("%d %d\n", query_key(i), l_key_state[i]);
 			key_press_callback(get_keycode(i));
 			release_key(i);
-		}else if(query_key(i) == KEY_STATE_RELEASE){
-			key_state[i] = KEY_STATE_WAIT_RELEASE;
-		}else if(query_key(i) == KEY_STATE_WAIT_RELEASE){
+			return true;
+	    } else if(query_key(i) == KEY_STATE_RELEASE 
+				/*&& l_key_state[i] != KEY_STATE_RELEASE*/) {
+//			printf("%d %d\n", query_key(i), l_key_state[i]);
 			key_release_callback(get_keycode(i));
-			key_state[i] = KEY_STATE_EMPTY;
+			clear_key(i);
+			return true;	    
 		}
 	}
-	//assert(0);
+
 	sti();
-	return flags;
+	return false;
 }
-
-
-static inline void 
-key_ispressed(int scanCode) {
-	int i ;
-	int isPress = !(scanCode & 0x80);
-	scanCode = scanCode & (0x80 - 1);
-	if(isPress){
-		for(i = 0 ; i < NR_KEYS ; i++){
-			if(get_keycode(i) == scanCode){
-			/*	if(key_state[i] == KEY_STATE_PRESS || key_state[i] == KEY_STATE_WAIT_RELEASE){
-					release_key(i);
-				}else {
-					key_state[i] = KEY_STATE_PRESS;
-				}*/
-				if(key_state[i] == KEY_STATE_WAIT_RELEASE)
-					key_state[i] = KEY_STATE_RELEASE;
-				else if(key_state[i] == KEY_STATE_EMPTY) 
-					key_state[i] = KEY_STATE_PRESS;
-			}
-		}
-	}
-}
-

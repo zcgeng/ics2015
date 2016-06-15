@@ -14,4 +14,4 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(in);
+make_helper_v(in_p2r);

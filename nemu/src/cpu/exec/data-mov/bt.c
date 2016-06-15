@@ -14,5 +14,4 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(bt_i2rm)
-make_helper_v(bt_r2rm)
+make_helper_v(bt_r2rm);

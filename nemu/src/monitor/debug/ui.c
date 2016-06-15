@@ -63,8 +63,8 @@ static int cmd_info(char *args){
 		printf("eax:%08x ecx:%08x edx:%08x ebx:%08x\n", cpu.eax, cpu.ecx, cpu.edx, cpu.ebx);
 		printf("esp:%08x ebp:%08x esi:%08x edi:%08x\n", cpu.esp, cpu.ebp, cpu.esi, cpu.edi);
 		printf("eip:%08x\n", cpu.eip);
-		printf("CF:%d PF:%d AF:%d DF:%d\n", cpu.CF, cpu.PF, cpu.AF, cpu.DF);
-		printf("ZF:%d SF:%d OF:%d\n", cpu.ZF, cpu.SF, cpu.OF);
+		printf("CF:%d PF:%d AF:%d DF:%d\n", eflags.CF, eflags.PF, eflags.AF, eflags.DF);
+		printf("ZF:%d SF:%d OF:%d\n", eflags.ZF, eflags.SF, eflags.OF);
 		printf("cpu.CR0:%08x cpu.PE:%d cpu.PG:%d\n", cpu.cr0.val, cpu.cr0.protect_enable, cpu.cr0.paging);
 		printf("cpu.CR3:%08x\n", cpu.cr3.val);
 		printf("cpu.GDTR.base:%08x cpu.GDTR.limit:%d\n", cpu.GDTR.base, cpu.GDTR.limit);

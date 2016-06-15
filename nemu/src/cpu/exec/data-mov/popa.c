@@ -13,4 +13,5 @@
 #undef DATA_BYTE
 
 /* for instruction encoding overloading */
-make_helper_v(popa_r);
+
+make_helper_v(popa_r)

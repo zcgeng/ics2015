@@ -25,14 +25,8 @@ make_helper(rep) {
 				|| ops_decoded.opcode == 0xaf	// scasw
 				);
 
-			/* DONE: Jump out of the while loop if necessary. */
-			            if (   ops_decoded.opcode == 0xa6	    // cmpsb
-				|| ops_decoded.opcode == 0xa7	    // cmpsw
-				|| ops_decoded.opcode == 0xae	    // scasb
-				|| ops_decoded.opcode == 0xaf) {	// scasw
-			    if (cpu.ZF == 0) break;
-			}
-			    
+			/* TODO: Jump out of the while loop if necessary. */
+
 		}
 		len = 1;
 	}

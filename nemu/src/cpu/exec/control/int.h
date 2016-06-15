@@ -3,4 +3,7 @@
 
 make_helper(int_i_b);
 
+make_helper(int_i_v);
+
+
 #endif
