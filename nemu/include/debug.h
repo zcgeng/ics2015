@@ -6,8 +6,6 @@
 
 extern FILE* log_fp;
 
-//volatile static int dummy=0;
-
 #ifdef LOG_FILE
 #	define Log_write(format, ...) fprintf(log_fp, format, ## __VA_ARGS__), fflush(log_fp)
 #else

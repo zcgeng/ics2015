@@ -14,5 +14,5 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(cmps_m);
+make_helper_v(cmps)
 

@@ -2,27 +2,16 @@
 
 #define instr test
 
-static void do_execute () {
-	DATA_TYPE ans = op_dest->val & op_src->val;
-
-	/* TODO: Update EFLAGS. */
-	DATA_TYPE pf=(ans & 255);
-	pf=(pf>>4)&pf;
-	pf=(pf>>2)&pf;
-	pf=(pf>>1)&pf;
-	eflags.PF=(pf & 1);
-	eflags.ZF=(ans == 0);
-	eflags.SF=MSB(ans);
-
-	eflags.CF=eflags.OF=0;
+static void do_execute() {
+	cpu.OF = 0;
+	cpu.CF = 0;
+	DATA_TYPE result = op_src->val & op_dest->val;
+	update_EFLAGS_PZS(result);
 	print_asm_template2();
 }
 
 make_instr_helper(i2a)
 make_instr_helper(i2rm)
-#if DATA_BYTE == 2 || DATA_BYTE == 4
-make_instr_helper(si2rm)
-#endif
 make_instr_helper(r2rm)
 
 #include "cpu/exec/template-end.h"

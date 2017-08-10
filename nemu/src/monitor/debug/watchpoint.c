@@ -6,79 +6,87 @@
 static WP wp_list[NR_WP];
 static WP *head, *free_;
 
-WP* new_wp() {
-	if (free_==NULL) assert(0);
-	WP *new=free_;
-	free_=(*free_).next;
-	(*new).next=head;
-	head=new;
-	printf("New watchpoint %d = ", (*new).NO);
-	return new;
-}
-
-void free_wp(char *expr) {
-	WP *list1=head;
-	int num;
-	sscanf(expr, "%d", &num);
-	printf("%d\n", num);
-	if ((*list1).NO==num) {
-		printf("Delete watchpoint %d\n", (*list1).NO);
-		head=(*list1).next;
-		(*list1).next=free_;
-		free_=list1;
-	}
-	else {
-		WP *list2=(*list1).next;
-		while (list2!=NULL) {
-			if ((*list2).NO==num) {
-				printf("Delete watchpoint %d\n", (*list2).NO);
-				(*list1).next=(*list2).next;
-				(*list2).next=free_;
-				free_=list2;
-			}
-			list1=list2;
-			list2=(*list2).next;
-		}
-	}
-}
-
 void init_wp_list() {
 	int i;
 	for(i = 0; i < NR_WP; i ++) {
-		wp_list[i].NO = i+1;
+		wp_list[i].NO = i;
 		wp_list[i].next = &wp_list[i + 1];
 	}
 	wp_list[NR_WP - 1].next = NULL;
-	
+
 	head = NULL;
 	free_ = wp_list;
 }
 
-bool check() {
-	WP *list=head;
-	bool flag=false, success=true;
-	while (list!=NULL) {
-		int v=expr((*list).expr, &success);
-		if (v!=(*list).value) {
-			printf("Stop at watchpoint %d:\n", (*list).NO);
-			printf("Old value = %d\n", (*list).value);
-			printf("New value = %d\n", v);
-			(*list).value=v;
-			flag=true;
-		}
-		list=(*list).next;
-	}
-	return flag;
-}
-
-void print_w() {
-	WP *list=head;
-	while (list!=NULL) {
-		printf("Num    Type    Disp Enb Address\n");
-		printf("%-3d watchpoint keep  n  %-7s\n", (*list).NO, (*list).expr);
-		list=(*list).next;
-	}
-}
 /* TODO: Implement the functionality of watchpoint */
 
 
+void new_wp(char* args){
+    if( free_ == NULL ) assert(0);
+    WP* tmp = free_;
+    strcpy(tmp->s_expr, args);
+    bool success;
+    tmp->last_value = expr(args, &success);
+    if( success == false ){
+        printf("Failed to create a new watchpoint(bad expression)\n");
+        return;
+    }
+    free_ = free_ -> next;
+    tmp -> next = head;
+    head = tmp;
+    return;
+}
+
+void free_wp(int number){
+    WP* tmp = head;
+    WP* last = head;
+    while(tmp){
+        if( tmp -> NO == number)
+            break;
+        last = tmp;
+        tmp = tmp -> next;
+    }
+    if( tmp == NULL ){
+        printf("didn't find watchpoint number : %d\n", number);
+        return;
+    }
+    if( tmp == head ) 
+        head = tmp -> next;
+    else
+        last -> next = tmp -> next;
+    tmp -> next = free_;
+    free_ = tmp;
+    printf("watchpoint %d deleted\n", number);
+    return;
+}
+
+void check_wp(int* nemu_state){
+    WP* wp = head;
+    while( wp ){
+        bool success;
+        int value = expr(wp->s_expr, &success);
+        if( value != wp->last_value ){
+            *nemu_state = 0;
+            printf("%8x    hit watchpoint %d : the value of the ( %s ) changed from 0x%x to 0x%x\n", cpu.eip, wp->NO,wp->s_expr, wp->last_value, value);
+            wp -> last_value = value;
+        }
+        wp = wp -> next;
+    }
+}
+
+void print_wp(){
+    if( head == NULL ){
+        printf("There is no watchpoint!\n");
+        return;
+    }
+    printf("watchpoints:\nNO\tEXPR\t\tVALUE\n");
+    int i = 0;
+    for(i = 0; i < 32; ++i){
+        WP* wp = head;
+        while( wp && wp->NO != i )
+            wp = wp->next;
+        if(wp)
+            printf("%d\t%s\t0x%x\t\n", wp->NO, wp->s_expr, wp->last_value);
+    }
+    return;
+}

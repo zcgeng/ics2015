@@ -28,10 +28,11 @@ make_helper(concat(shldi_, SUFFIX)) {
 	return len + 1;
 }
 make_helper(concat(shldc_, SUFFIX)) {
-	int len = concat(decode_rm2r_, SUFFIX) (eip + 1);
+	int len = concat(decode_rm2r_, SUFFIX) (eip + 1);  /* use decode_r_rm2r to read register */
 	op_dest->val = REG(op_dest->reg);
-	*op_src2 = *op_src; /* small hack */
-	op_src->val = REG(R_CL);
+	op_src->type = OP_TYPE_REG;
+	op_src->reg = R_ECX;
+	op_src->val = REG(R_ECX);
 	do_execute();
 	return len + 1;
 }

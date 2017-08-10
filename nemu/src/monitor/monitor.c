@@ -5,19 +5,32 @@
 extern uint8_t entry [];
 extern uint32_t entry_len;
 extern char *exec_file;
-//extern CPU_flags eflags;
 
 void load_elf_tables(int, char *[]);
 void init_regex();
 void init_wp_list();
 void init_ddr3();
 void init_cache();
+void init_cache2();
 void init_tlb();
-#ifdef HAS_DEVICE
-void init_device();
-void init_sdl();
-#endif
+
 FILE *log_fp = NULL;
+
+static void init_seg(){
+	int i;
+	for(i = 0; i < 4; ++i)
+		cpu.SR_cache[i].valid = 0;
+	cpu.cs = 8;
+	cpu.cr0.val = 0;
+	cpu.SR_cache[R_CS].base = 0;
+	cpu.SR_cache[R_CS].limit = 0xffffffff;
+}
+
+static void init_caches(){
+	init_cache();
+	init_cache2();
+	init_tlb();
+}
 
 static void init_log() {
 	log_fp = fopen("log.txt", "w");
@@ -31,6 +44,7 @@ static void welcome() {
 
 void init_monitor(int argc, char *argv[]) {
 	/* Perform some global initialization */
+
 	/* Open the log file. */
 	init_log();
 
@@ -42,11 +56,6 @@ void init_monitor(int argc, char *argv[]) {
 
 	/* Initialize the watchpoint link list. */
 	init_wp_list();
-
-#ifdef HAS_DEVICE	
-	init_device();
-	init_sdl();
-#endif
 
 	/* Display welcome message. */
 	welcome();
@@ -84,26 +93,8 @@ static void load_entry() {
 	fclose(fp);
 }
 
-void init_eflags() {
-	eflags.a=1;
-	eflags.b=0;
-	eflags.c=0;
-}
-
-void init_CR0() {
-	cpu.cr0.protect_enable=0;
-	cpu.cr0.paging=0;
-	int i;
-	for (i=0; i<4; i++)
-		cpu.SR_cache[i].vaild=false;
-	cpu.SR_cache[1].vaild=true;
-	cpu.SR_cache[1].base=0;
-	cpu.SR_cache[1].limit=0xffffffff;
-}
-
 void restart() {
 	/* Perform some initialization to restart a program */
-	init_eflags();
 #ifdef USE_RAMDISK
 	/* Read the file with name `argv[1]' into ramdisk. */
 	init_ramdisk();
@@ -115,14 +106,14 @@ void restart() {
 	/* Set the initial instruction pointer. */
 	cpu.eip = ENTRY_START;
 
+	/* Initialize cache */
+	init_caches();
+
 	/* Initialize DRAM. */
 	init_ddr3();
 
-	/* Initialize cache. */
-	init_cache();
-
-	/* Initialize CR0. */
-	init_CR0();
-
-	init_tlb();
+	/* Initialize registers */
+	cpu.eflags = 0x00000002;
+	
+	init_seg();
 }

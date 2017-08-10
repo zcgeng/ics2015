@@ -7,7 +7,8 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ , NUM, LPER, RPER, DEREF, NUM16, REG, NEG, VAR
+	NOTYPE = 256, EQ, NEQ, SHL, SHR, LE, GE, NUM, MINUS, DEREF, AND, OR, NUM16, REG, VAR
+    
 	/* TODO: Add more token types */
 
 };
@@ -15,26 +16,40 @@ enum {
 static struct rule {
 	char *regex;
 	int token_type;
+    int precedence; // 优先级,无意义时值为99
+    bool associate; // 结合性:从左向右结合为1,从右向左为0
 } rules[] = {
 
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
 
-	{" +",	NOTYPE},				// spaces
-	{"[a-zA-Z_]+[0-9a-zA-Z_]+", VAR},		// var
-	{"\\+", '+'},					// plus 43
-	{"\\-", '-'}, 					// 45
-	{"\\*", '*'},					//42
-	{"\\/", '/'},					//47
-	{"\\(", LPER},
-	{"\\)", RPER},
-	{"0x[0-9|a-f]{1,32}", NUM16},
-	{"\\$[a-z]+", REG},
-	{"[0-9]{1,32}", NUM},
-	{"==", EQ}					// equal
-};
-
+	{" +",	NOTYPE, 99, 0},				// spaces
+	{"\\+", '+', 12, 1},					// plus
+	{"==", EQ, 10, 1},			    		// equal
+    {"!=", NEQ, 10, 1},
+    {"&&", AND, 5, 1},
+    {"\\|\\|", OR, 4, 1},
+    {"-", '-', 12, 1},                     // sub
+    {"\\*", '*', 13, 1},                   // mul
+    {"/", '/', 13, 1},                     // dev
+    {"\\(", '(', 15, 1},                   // left bracket
+    {"\\)", ')', 15, 1},                   // right bracket
+    {"%", '%', 13, 1},                      // mod
+    {"<<", SHL, 11, 1},                     // shift left
+    {">>", SHR, 11, 1},                     // shift right
+    {">=", GE, 10, 1},
+    {"<=", LE, 10, 1},
+    {">", '>', 10, 1},
+    {"<", '<', 10, 1},
+    {"\\!", '!', 14, 0},
+    {"\\$[a-zA-Z]+",REG, 99, 0},                  // registers
+    {"0x[0-9a-fA-F]+", NUM16, 99, 0},
+    {"[0-9]+", NUM, 99, 0},                       // numbers
+    {"[a-zA-Z_]+[a-zA-Z0-9_]*", VAR, 99, 0},      //variables
+    //{"-", MINUS, 14, 0},                    // 取负 并不能被匹配到
+    //{"*", DEREF, 14, 0}                     // 取值
+}; 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
 
 static regex_t re[NR_REGEX];
@@ -51,13 +66,15 @@ void init_regex() {
 		ret = regcomp(&re[i], rules[i].regex, REG_EXTENDED);
 		if(ret != 0) {
 			regerror(ret, &re[i], error_msg, 128);
-			Assert(ret == 0, "regex compilation failed: %s\n%s", error_msg, rules[i].regex);
+			Assert(ret != 0, "regex compilation failed: %s\n%s", error_msg, rules[i].regex);
 		}
 	}
 }
 
 typedef struct token {
 	int type;
+    int precedence;
+    bool associate;
 	char str[32];
 } Token;
 
@@ -66,38 +83,68 @@ int nr_token;
 
 static bool make_token(char *e) {
 	int position = 0;
-	int i, j;
+	int i;
 	regmatch_t pmatch;
+	
 	nr_token = 0;
-//	printf("%d\n", NR_REGEX);
+
 	while(e[position] != '\0') {
-//		printf("%d %c\n", position, e[position]);  
 		/* Try all rules one by one. */
 		for(i = 0; i < NR_REGEX; i ++) {
 			if(regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
 				char *substr_start = e + position;
 				int substr_len = pmatch.rm_eo;
-//				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
+
+				//Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
-//				printf("%d\n", rules[i].token_type);
+
+				/* DONE: Now a new token is recognized with rules[i]. Add codes
+				 * to record the token in the array ``tokens''. For certain 
+				 * types of tokens, some extra actions should be performed.
+				 */
+
+                tokens[nr_token].type = rules[i].token_type;
+                tokens[nr_token].associate = rules[i].associate;
+                tokens[nr_token].precedence = rules[i].precedence;
 				switch(rules[i].token_type) {
-					case 43:
-					case 45:
-					case 42:
-					case 47:
-					case LPER:
-					case RPER:
-					case NUM: 
-					case REG:
-					case EQ:
-					case NUM16: 
-					case VAR:
-					tokens[nr_token].type=rules[i].token_type;
-					for (j=0; j<substr_len; j++) tokens[nr_token].str[j]=substr_start[j];
-					nr_token++;
-				//	default: panic("please implement me");
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '(':
+                case ')':
+                case '%':
+                case '>':
+                case '<':
+                case '!':
+                case AND:
+                case OR:
+                case EQ:
+                case NEQ:
+                case SHL:
+                case SHR:
+                case GE:
+                case LE:
+                    break;
+                case REG:
+                case NUM:
+                case VAR:
+                case NUM16:
+                    if(substr_len > 31){
+                        printf("input too long number!\n");
+                        return false;
+                    }
+                    strncpy(tokens[nr_token].str, substr_start, substr_len);
+                    tokens[nr_token].str[substr_len] = '\0';
+                    break;
+                case NOTYPE:
+                    nr_token--;
+                    break;
+                default: printf("can not recognize the token type : %d\n",rules[i].token_type);
+                         return false;
 				}
-				//nr_token++;
+                nr_token++;
+
 				break;
 			}
 		}
@@ -110,125 +157,233 @@ static bool make_token(char *e) {
 
 	return true; 
 }
-
-bool check_parentheses(int p, int q) {
-	int i;
-	if (tokens[p].type==259 && tokens[q].type==260) {
-		int npar=1;
-		for (i=p+1; i<q; i++) {
-		if (npar==0) return false;
-			if (tokens[i].type==259) npar++;
-			if (tokens[i].type==260) npar--;
-		}
-	}
-	else return false;
-	return true;
+bool check_parentheses(int p, int q){
+    // 只检验是否被一对括号包围
+    int count = 0;
+    bool flag = true;
+    if(tokens[p].type != '(' || tokens[q].type != ')')
+        return false;
+    int i;
+    for(count = 0, i = p+1; i <= q-1; ++i){
+        int tmp = tokens[i].type;
+        if( tmp == '(' )
+            count++;
+        else if( tmp == ')' )
+            count--;
+        if (count < 0) 
+            flag = false;
+    }
+    if(count != 0) flag = false;
+    return flag;
 }
 
-uint32_t domope(int p, int q) {
-	int i, pos=p, nper=0;
+int get_var(char*);//用于查找变量
 
-	for (i=p; i<=q; i++) {
-		if (tokens[i].type==LPER) nper++;
-		if (tokens[i].type==RPER) nper--;
-		if ((tokens[i].type==43 || tokens[i].type==45) && (i>pos) && (nper==0)) pos=i;
-	}
-	if (pos==p) for (i=p; i<=q; i++) {
-		if (tokens[i].type==LPER) nper++;
-		if (tokens[i].type==RPER) nper--;
-		if ((tokens[i].type==42 || tokens[i].type==47) && (i>pos)&& (nper==0)) pos=i;
-	}
-	if (pos==p) for (i=p; i<=q; i++) {
-		if (tokens[i].type==LPER) nper++;
-		if (tokens[i].type==RPER) nper--;
-		if ((tokens[i].type==EQ) && (i>pos) && (nper==0)) pos=i;
-	}
-	return pos;
+int eval(int p, int q, bool *success){
+    if(p>q){
+        printf("Bad expression : p > q\n");
+        *success = false;
+        return 1;
+        /*Bad expression*/
+    }
+    else if(p == q){	
+        /*Single token.
+         * For now this token should be a number.	
+         * Return the value of the number.
+         */	
+        if(tokens[p].type == NUM){
+            int number = 0;
+            char *tmp = tokens[p].str;
+            while(*tmp){
+                number = number * 10 + *tmp - '0';
+                tmp++;
+            }
+            return number;
+        }
+        else if(tokens[p].type == NUM16){
+            int number = 0;
+            char *tmp = tokens[p].str + 2;
+            while(*tmp){
+                number = number * 16;
+                if(*tmp >= '0' && *tmp <= '9')
+                    number += *tmp - '0';
+                else if(*tmp >= 'a' && *tmp <= 'f')
+                    number += *tmp - 'a' + 10;
+                else if(*tmp >= 'A' && *tmp <= 'F')
+                    number += *tmp - 'A' + 10;
+                else{
+                    printf("Error occured when recognizing NUM16\n");
+                    *success = false;
+                    return 1;
+                }
+                tmp++;
+            }
+            return number;
+        }
+        else if(tokens[p].type == REG){
+            char *reg = tokens[p].str;
+            if( strlen(reg) <= 2 ){
+                printf("Wrong register name! %s\n",reg);
+                *success = false;
+                return 1;
+            }
+            // 调用读取寄存器
+            reg ++;
+            //Log("reg = %s\n",reg);
+            int i = 0;
+            if(strcasecmp(reg, "eip") == 0){
+                return cpu.eip;
+            }
+            if(strcasecmp(reg, "cf") == 0){
+                return cpu.CF;
+            }
+            if(strcasecmp(reg, "pf") == 0){
+                return cpu.PF;
+            }
+            if(strcasecmp(reg, "zf") == 0){
+                return cpu.ZF;
+            }
+            if(strcasecmp(reg, "sf") == 0){
+                return cpu.SF;
+            }
+            if(strcasecmp(reg, "if") == 0){
+                return cpu.IF;
+            }
+            if(strcasecmp(reg, "df") == 0){
+                return cpu.DF;
+            }
+            if(strcasecmp(reg, "of") == 0){
+                return cpu.OF;
+            }
+            for(i = 0; i < 8; ++i)
+                if(strcasecmp(regsl[i], reg) == 0)
+                    return reg_l(i);
+            for(i = 0; i < 8; ++i)
+                if(strcasecmp(regsw[i], reg) == 0)
+                    return reg_w(i);
+            for(i = 0; i < 8; ++i)
+                if(strcasecmp(regsb[i], reg) == 0)
+                    return reg_b(i);
+            printf("didn't find register : %s\n", tokens[p].str);
+            *success = false;
+            return 1;
+        }
+        else if(tokens[p].type == VAR){
+            //look it up in the symtab
+            int result = get_var(tokens[p].str);
+            if(result == -1){
+                *success = false;
+                printf("didn't find variable : %s\n", tokens[p].str);
+                return 1;
+            }
+            else return result;
+        }
+    }
+    else if(check_parentheses(p, q) == true) {
+        /* The expression is surrounded by a matched pair of parentheses.	
+         * If that is the case, just throw away the parentheses.
+         */
+        return eval(p + 1, q - 1,success);	
+    }
+    else{
+        bool par_err = false; 
+        int op = p;
+        int count = 0;
+        int i = 0;
+        for(i = p; i <= q; ++i){
+            if(tokens[i].type == '(') count++;
+            else if(tokens[i].type == ')') count--;
+            else if(count == 0){
+                if(tokens[i].precedence < tokens[op].precedence)
+                    op = i; // 找到最低优先级
+                if(tokens[i].precedence == tokens[op].precedence && tokens[i].associate == 1)
+                    op = i; // 找到最后结合的 
+            }
+            if(count < 0) par_err = true;
+        }
+        if(count != 0) par_err = true;
+        if(par_err){
+            printf("parentheses error!\n");
+            *success = false;
+            return 1;
+        }
+        
+        int op_type = tokens[op].type;
+        int val1 = 0, val2 = 0;
+        if(op_type == MINUS || op_type == DEREF || op_type == '!'){
+            val1 = eval(op+1, q, success);
+        }
+        else{
+            val1 = eval(p, op- 1,success);
+            val2 = eval(op + 1, q,success);	
+        }
+        switch(op_type) {
+            case '+': return val1 + val2;
+            case '-': return val1 - val2;
+            case '*': return val1 * val2;
+            case '/': 
+                if(val2==0){
+                    printf("Error! divided by 0\n");
+                    *success = false;
+                    return 1;
+                }
+                else return val1/val2;
+            case '%':
+                if(val2==0){
+                    printf("Error! mod by 0\n");
+                    *success = false;
+                    return 1;
+                }
+                else return val1 % val2;
+            case MINUS: return -val1;
+            case DEREF: return swaddr_read(val1, 4, R_DS);
+            case '!' : return !val1;
+            case AND : return val1 && val2;
+            case OR : return val1 || val2;
+            case EQ : return val1 == val2;
+            case NEQ : return val1 != val2;
+            case '>' : return val1 > val2;
+            case '<' : return val1 < val2;
+            case SHL : return val1 << val2;
+            case SHR : return val1 >> val2;
+            case GE : return val1 >= val2;
+            case LE : return val1 <= val2;
+            default: printf("op_type : didn't find %d\n",op_type);
+                    *success = false;
+                    return 1;
+        }
+    }
+    *success = false;
+    return 1;
 }
-
-extern int find_var(char *str);
-
-uint32_t eval(int p, int q) {
-//	printf("	%d %d\n", p, q);
-	if(p > q) panic(" Bad expression ");
-	else if(p == q) {
-//		printf("type %d str %s\n", tokens[p].type, tokens[p].str);
-		if (tokens[p].type==NUM) {
-			int val=0, i;
-			for (i=0; i<strlen(tokens[p].str); i++) val=val*10+tokens[p].str[i]-'0';
-//			printf("NUM=%d\n", val);
-			return val;
-		}	
-		else if (tokens[p].type==NUM16) {
-			int val=0, i;
-			for (i=2; i<strlen(tokens[p].str); i++) 
-			if (tokens[p].str[i]>='a' && tokens[p].str[i]<='z') val=val*16+tokens[p].str[i]-'a'+10;
-			else val=val*16+tokens[p].str[i]-'0';
-//			printf("16NUM=%d\n",val);
-			return val;
-		}
-		else if (tokens[p].type==REG) {
-//			printf("%s\n", tokens[p].str);
-			if (!strcmp(tokens[p].str,"$eax")) return cpu.eax;
-			else if (!strcmp(tokens[p].str,"$ecx")) return cpu.ecx;
-			else if (!strcmp(tokens[p].str,"$edx")) return cpu.edx;
-			else if (!strcmp(tokens[p].str,"$ebx")) return cpu.ebx;
-			else if (!strcmp(tokens[p].str,"$esp")) return cpu.esp;
-			else if (!strcmp(tokens[p].str,"$ebp")) return cpu.ebp;
-			else if (!strcmp(tokens[p].str,"$esi")) return cpu.esi; 
-			else if (!strcmp(tokens[p].str,"$edi")) return cpu.edi;
-			else if (!strcmp(tokens[p].str,"$eip")) return cpu.eip;
-			else panic(" Bad expression ");
-		}
-		else if (tokens[p].type==VAR) {
-			return find_var(tokens[p].str);
-		}
-		else panic(" Bad expression ");
-	}
-	else if (check_parentheses(p, q) == true) return eval(p + 1, q - 1);
-	else if (tokens[p].type==NEG) return 0-eval(p+1, q);
-	else if (tokens[p].type==DEREF) {
-		return swaddr_read(eval(p+1, q), 1, R_DS);
-	}
-	else {
-		int op = domope(p, q);
-	//	printf("%d	%c\n", op, tokens[op].type);
-		int op_type=tokens[op].type, val1 = eval(p, op - 1), val2 = eval(op + 1, q);
-		switch(op_type) {
-			case '+': return val1 + val2;
-			case '-': return val1 - val2;
-			case '*': return val1 * val2;
-			case '/': return val1 / val2;
-			case EQ: {
-				if (val1 == val2) return 1;
-				else return 0;
-				}
-			default: assert(1);
-		}
-	}
-	printf("NOooooooooooooo");
-	return 0;
-}
-
 uint32_t expr(char *e, bool *success) {
-	int i;
-	for (i=0; i<nr_token; i++)
-		memset(tokens[i].str, 0 , sizeof(tokens[i].str));
+    if( strlen(e) > 31 ){
+        *success = false;
+        printf("Too long expression!\n");
+        return 0;
+    }
 	if(!make_token(e)) {
 		*success = false;
 		return 0;
 	}
-//	printf("nr_token=%d\n", nr_token);
-	for(i = 0; i < nr_token; i ++) {
-		if(tokens[i].type=='*' && (i==0 || tokens[i-1].type=='+' || tokens[i-1].type == '-' || tokens[i-1].type=='*' || tokens[i-1].type=='/')) tokens[i].type=DEREF;
-		if(tokens[i].type=='-' && (i==0 || tokens[i-1].type=='+' || tokens[i-1].type ==NEG  || tokens[i-1].type=='*' || tokens[i-1].type=='/')) tokens[i].type=NEG;
-	}
-//	printf("%s = %d\n", e, eval(0, nr_token-1));
-//	int i;
-//	for (i=0; i<nr_token; i++)
-//		printf("%d	%s\n", tokens[i].type, tokens[i].str);	
-	/* TODO: Insert codes to evaluate the expression. */
-	return eval(0, nr_token-1);
-//	return 0;
+
+	/* DONE: Insert codes to evaluate the expression. */
+    int i = 0;
+    for(i = 0; i < nr_token; i++){
+        if(tokens[i].type == '-' && (i == 0 || (tokens[i-1].type != NUM && tokens[i-1].type != REG))){
+            tokens[i].type = MINUS;
+            tokens[i].precedence = 14;
+            tokens[i].associate = 0;
+        }
+        if(tokens[i].type == '*' && (i == 0 || (tokens[i-1].type != NUM && tokens[i-1].type != REG))){
+            tokens[i].type = DEREF;
+            tokens[i].precedence = 14;
+            tokens[i].associate = 0;
+        }
+    }
+    *success = true;
+    return eval(0,nr_token-1,success);
+	//panic("please implement me");
+	return 0;
 }
 

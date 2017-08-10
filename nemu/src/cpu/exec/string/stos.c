@@ -14,5 +14,4 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(stos_m);
-
+make_helper_v(stos)

@@ -3,19 +3,13 @@
 #define instr xor
 
 static void do_execute () {
-	DATA_TYPE ans = op_dest->val ^ op_src->val;
-	OPERAND_W(op_dest, ans);
+	DATA_TYPE result = op_dest->val ^ op_src->val;
+	OPERAND_W(op_dest, result);
 
-	/* TODO: Update EFLAGS. */
-	DATA_TYPE pf=(ans & 255);
-	pf=(pf>>4)&pf;
-	pf=(pf>>2)&pf;
-	pf=(pf>>1)&pf;
-	eflags.PF=(pf & 1);
-	eflags.ZF=(ans == 0);
-	eflags.SF=MSB(ans);
-
-	eflags.CF=eflags.OF=0;
+	/* DONE: Update EFLAGS. */
+	//panic("please implement me");
+	update_EFLAGS_PZS(result);
+	cpu.OF = cpu.CF = 0;
 
 	print_asm_template2();
 }

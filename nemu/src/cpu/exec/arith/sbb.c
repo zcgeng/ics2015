@@ -14,8 +14,9 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(sbb_si2rm)
 make_helper_v(sbb_i2a)
 make_helper_v(sbb_i2rm)
-make_helper_v(sbb_r2rm)
+make_helper_v(sbb_si2rm)
+make_helper_v(sbb_r2rm)	
 make_helper_v(sbb_rm2r)
+

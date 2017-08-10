@@ -14,5 +14,4 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(movzx_rm_b2r)
-make_helper_v(movzx_rm_w2r)
+make_helper_v(movzx_rm2r)

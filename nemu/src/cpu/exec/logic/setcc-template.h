@@ -4,7 +4,7 @@
 #define instr seto
 
 static void do_execute() {
-	if(eflags.OF == 1) OPERAND_W(op_src, 1);
+	if(cpu.OF == 1) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -16,7 +16,7 @@ make_instr_helper(rm)
 #define instr setno
 
 static void do_execute() {
-	if(eflags.OF == 0) OPERAND_W(op_src, 1);
+	if(cpu.OF == 0) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -28,7 +28,7 @@ make_instr_helper(rm)
 #define instr setb
 
 static void do_execute() {
-	if(eflags.CF == 1) OPERAND_W(op_src, 1);
+	if(cpu.CF == 1) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -40,7 +40,7 @@ make_instr_helper(rm)
 #define instr setae
 
 static void do_execute() {
-	if(eflags.CF == 0) OPERAND_W(op_src, 1);
+	if(cpu.CF == 0) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -52,7 +52,7 @@ make_instr_helper(rm)
 #define instr sete
 
 static void do_execute() {
-	if(eflags.ZF == 1) OPERAND_W(op_src, 1);
+	if(cpu.ZF == 1) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -64,7 +64,7 @@ make_instr_helper(rm)
 #define instr setne
 
 static void do_execute() {
-	if(eflags.ZF == 0) OPERAND_W(op_src, 1);
+	if(cpu.ZF == 0) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -76,7 +76,7 @@ make_instr_helper(rm)
 #define instr setbe
 
 static void do_execute() {
-	if(eflags.CF == 1 || eflags.ZF == 1) OPERAND_W(op_src, 1);
+	if(cpu.CF == 1 || cpu.ZF == 1) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -88,7 +88,7 @@ make_instr_helper(rm)
 #define instr seta
 
 static void do_execute() {
-	if(eflags.CF == 0 && eflags.ZF == 0) OPERAND_W(op_src, 1);
+	if(cpu.CF == 0 && cpu.ZF == 0) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -100,7 +100,7 @@ make_instr_helper(rm)
 #define instr sets
 
 static void do_execute() {
-	if(eflags.SF == 1) OPERAND_W(op_src, 1);
+	if(cpu.SF == 1) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -112,7 +112,7 @@ make_instr_helper(rm)
 #define instr setns
 
 static void do_execute() {
-	if(eflags.SF == 0) OPERAND_W(op_src, 1);
+	if(cpu.SF == 0) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -124,7 +124,7 @@ make_instr_helper(rm)
 #define instr setp
 
 static void do_execute() {
-	if(eflags.PF == 1) OPERAND_W(op_src, 1);
+	if(cpu.PF == 1) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -136,7 +136,7 @@ make_instr_helper(rm)
 #define instr setnp
 
 static void do_execute() {
-	if(eflags.PF == 0) OPERAND_W(op_src, 1);
+	if(cpu.PF == 0) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -148,7 +148,7 @@ make_instr_helper(rm)
 #define instr setl
 
 static void do_execute() {
-	if(eflags.SF != eflags.OF) OPERAND_W(op_src, 1);
+	if(cpu.SF != cpu.OF) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -160,7 +160,7 @@ make_instr_helper(rm)
 #define instr setge
 
 static void do_execute() {
-	if(eflags.SF == eflags.OF) OPERAND_W(op_src, 1);
+	if(cpu.SF == cpu.OF) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -172,7 +172,7 @@ make_instr_helper(rm)
 #define instr setle
 
 static void do_execute() {
-	if(eflags.ZF == 1 || eflags.SF != eflags.OF) OPERAND_W(op_src, 1);
+	if(cpu.ZF == 1 || cpu.SF != cpu.OF) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
@@ -184,7 +184,7 @@ make_instr_helper(rm)
 #define instr setg
 
 static void do_execute() {
-	if(eflags.ZF == 0 && eflags.SF == eflags.OF) OPERAND_W(op_src, 1);
+	if(cpu.ZF == 0 && cpu.SF == cpu.OF) OPERAND_W(op_src, 1);
 	else OPERAND_W(op_src, 0);
 	print_asm_template1();
 }
