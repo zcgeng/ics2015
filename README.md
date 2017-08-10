@@ -1,5 +1,9 @@
 # ICS2015 Programming Assignment
 
+学弟学妹们：
+  本repo放在这里是当年方便我自己备份代码的，你们做作业遇到困难时仅限参考debug，切勿直接copy。
+  祝食用愉快
+
 This project is the programming assignment of the class ICS(Introduction to Computer System) in Department of Computer Science and Technology, NanJing University.
 
 For the guide of this programming assignment, refer to http://nju-ics.gitbooks.io/ics2015-programming-assignment/content/
