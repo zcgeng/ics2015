@@ -23,13 +23,21 @@ make_helper(inv) {
 
 	assert(0);
 }
-
+uint32_t swaddr_read(swaddr_t, size_t, uint8_t);
 make_helper(nemu_trap) {
 	print_asm("nemu trap (eax = %d)", cpu.eax);
 
 	switch(cpu.eax) {
-		case 2:
-		   	break;
+		case 2: {
+			int i;
+			char val;
+			printf("ecx= %x\n", cpu.ecx);
+			for (i = 0; i < cpu.edx; i++) {
+				val = swaddr_read(cpu.ecx + i, 1, R_DS);
+				printf("%c", val);				
+			}
+			break;
+		}
 
 		default:
 			printf("\33[1;31mnemu: HIT %s TRAP\33[0m at eip = 0x%08x\n\n",

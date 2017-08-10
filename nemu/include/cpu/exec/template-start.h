@@ -26,7 +26,6 @@
 
 #define REG(index) concat(reg_, SUFFIX) (index)
 #define REG_NAME(index) concat(regs, SUFFIX) [index]
-#define SREG_NAME(index) sr[index]
 
 #define MEM_R(addr, sreg) swaddr_read(addr, DATA_BYTE, sreg)
 #define MEM_W(addr, data, sreg) swaddr_write(addr, DATA_BYTE, data, sreg)
@@ -34,9 +33,3 @@
 #define OPERAND_W(op, src) concat(write_operand_, SUFFIX) (op, src)
 
 #define MSB(n) ((DATA_TYPE)(n) >> ((DATA_BYTE << 3) - 1))
-#define update_EFLAGS_PZS(result) \
-    cpu.PF = 1; \
-    int i; \
-    for(i = 0; i < 8; ++i) cpu.PF ^= (result & 0xff) >> i; \
-    cpu.ZF = !result; \
-    cpu.SF = MSB(result);

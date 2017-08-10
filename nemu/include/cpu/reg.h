@@ -2,6 +2,7 @@
 #define __REG_H__
 
 #include "common.h"
+#include "../../lib-common/x86-inc/cpu.h"
 
 enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
 enum { R_AX, R_CX, R_DX, R_BX, R_SP, R_BP, R_SI, R_DI };
@@ -15,83 +16,79 @@ enum { R_ES, R_CS, R_SS, R_DS };
  * For more details about the register encoding scheme, see i386 manual.
  */
 
-typedef union{
-	struct 
-	{
-		uint16_t rpl	:2;
-		uint16_t ti	:1;
-		uint16_t index 	:13;
-	};
-	uint16_t val;
-}SELECTOR;
-
 typedef struct {
 	union {
-		uint32_t _32;
-		uint16_t _16;
-		uint8_t _8[2];
-	} gpr[8];
+		union {
+			uint32_t _32;
+			uint16_t _16;
+			uint8_t _8[2];
+		} gpr[8];
 
 	/* Do NOT change the order of the GPRs' definitions. */
 
-	// uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
-    #define eax gpr[0]._32
-    #define ecx gpr[1]._32
-    #define edx gpr[2]._32
-    #define ebx gpr[3]._32
-    #define esp gpr[4]._32
-    #define ebp gpr[5]._32
-    #define esi gpr[6]._32
-    #define edi gpr[7]._32
-	swaddr_t eip;
-
-    union{
-        struct{
-            uint32_t CF: 1;
-            uint32_t: 0;
-            uint32_t PF: 1;
-            uint32_t: 0;
-            uint32_t AF: 1;
-            uint32_t : 0;
-            uint32_t ZF: 1;
-            uint32_t SF: 1;
-            uint32_t TF: 1;
-            uint32_t IF: 1;
-            uint32_t DF: 1;
-            uint32_t OF: 1;
-            uint32_t IOPL: 1;
-            uint32_t NT: 1;
-            uint32_t : 0;
-            uint32_t RF: 1;
-            uint32_t VM: 1;
-        };
-        uint32_t eflags;
-    };
-
-	CR0 cr0;
-	CR3 cr3;
-
-	struct GDTR{
+		struct {
+			uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
+		};
+	};
+	struct {
 		uint32_t base;
 		uint16_t limit;
-	}gdtr;
-	
-	union{
-		SELECTOR SR[4];
-		struct{uint16_t es, cs, ss, ds;};
-	};
-
+	} GDTR;
 	struct {
-		bool valid;
+		uint32_t base;
+		uint16_t limit;
+	} IDTR;
+/*	union {
+		struct {
+			unsigned PE :  1;
+			unsigned a  : 31;
+		};
+		uint32_t _32;
+	} CR0;*/
+	CR0 cr0;
+	CR3 cr3;
+	union {
+		union {
+			struct {
+				unsigned RPL   : 2;
+				unsigned TI    : 1;
+				unsigned INDEX : 13;
+			};
+			uint16_t _16;
+		} SR[4];
+		struct {
+			uint16_t ES, CS, SS, DS;
+		};
+	};
+	struct {
+		bool vaild;
 		uint32_t base;
 		uint32_t limit;
-		uint32_t dpl : 2;
 	} SR_cache[4];
-
+	swaddr_t eip;
+	volatile bool INTR;
 } CPU_state;
 
-extern CPU_state cpu;
+typedef union {
+	struct {
+		unsigned CF: 1;
+		unsigned a : 1;
+		unsigned PF: 1;
+		unsigned b : 1;
+		unsigned AF: 1;
+		unsigned c : 1;
+		unsigned ZF: 1;
+		unsigned SF: 1;
+		unsigned TF: 1;
+		unsigned IF: 1;
+		unsigned DF: 1;
+		unsigned OF: 1;
+	};
+	uint32_t val;
+} CPU_flags;
 
+extern CPU_state cpu;
+extern CPU_flags eflags;
 static inline int check_reg_index(int index) {
 	assert(index >= 0 && index < 8);
 	return index;
@@ -100,11 +97,9 @@ static inline int check_reg_index(int index) {
 #define reg_l(index) (cpu.gpr[check_reg_index(index)]._32)
 #define reg_w(index) (cpu.gpr[check_reg_index(index)]._16)
 #define reg_b(index) (cpu.gpr[check_reg_index(index) & 0x3]._8[index >> 2])
-#define sreg(index) (cpu.SR[check_reg_index(index)].val)
 
 extern const char* regsl[];
 extern const char* regsw[];
 extern const char* regsb[];
-extern const char* sr[];
 
 #endif

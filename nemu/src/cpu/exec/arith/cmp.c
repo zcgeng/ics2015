@@ -14,9 +14,8 @@
 
 /* for instruction encoding overloading */
 
-make_helper_v(cmp_i2a)		//0x3D
-make_helper_v(cmp_i2rm)		//0x81 /7
-make_helper_v(cmp_si2rm)	//0x83 /7
-make_helper_v(cmp_r2rm)		//0x39
-make_helper_v(cmp_rm2r)		//0x3B
-
+make_helper_v(cmp_i2a)
+make_helper_v(cmp_i2rm)
+make_helper_v(cmp_si2rm)
+make_helper_v(cmp_r2rm)
+make_helper_v(cmp_rm2r)

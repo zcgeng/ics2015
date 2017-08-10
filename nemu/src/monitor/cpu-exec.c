@@ -7,11 +7,15 @@
  * This is useful when you use the ``si'' command.
  * You can modify this value as you want.
  */
-#define MAX_INSTR_TO_PRINT 20
+#define MAX_INSTR_TO_PRINT 1000
 
 int nemu_state = STOP;
 
 int exec(swaddr_t);
+bool check();
+uint32_t i8259_query_intr();
+void i8259_ack_intr();
+void raise_intr(uint8_t, uint32_t);
 
 char assembly[80];
 char asm_buf[128];
@@ -35,7 +39,6 @@ void do_int3() {
 }
 
 /* Simulate how the CPU works. */
-extern void check_wp(int *nemu_state);
 void cpu_exec(volatile uint32_t n) {
 	if(nemu_state == END) {
 		printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
@@ -61,8 +64,9 @@ void cpu_exec(volatile uint32_t n) {
 		/* Execute one instruction, including instruction fetch,
 		 * instruction decode, and the actual execution. */
 		int instr_len = exec(cpu.eip);
-
+//		if (cpu.eip>=0xc0100740 && cpu.eip <=0xc0100744) printf("%08x %d\n", cpu.eip, instr_len);
 		cpu.eip += instr_len;
+//		if (cpu.eip>=0xc0100740 && cpu.eip <=0xc0100744) printf("%08x %d\n", cpu.eip, instr_len);
 
 #ifdef DEBUG
 		print_bin_instr(eip_temp, instr_len);
@@ -73,10 +77,20 @@ void cpu_exec(volatile uint32_t n) {
 		}
 #endif
 
-		/* DONE: check watchpoints here. */
-        check_wp(&nemu_state);
-
+		/* TODO: check watchpoints here. */
+		if (check()) {
+			nemu_state=STOP;
+		}
+		
 		if(nemu_state != RUNNING) { return; }
+		if(cpu.INTR & eflags.IF) {
+			uint32_t intr_no = i8259_query_intr();
+			i8259_ack_intr();
+			int len;
+			len = get_len();
+			cpu.eip--;
+			raise_intr(intr_no, len);
+		}	
 	}
 
 	if(nemu_state == RUNNING) { nemu_state = STOP; }

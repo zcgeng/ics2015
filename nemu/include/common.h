@@ -1,12 +1,14 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-#define USE_RAMDISK
+//#define USE_RAMDISK
 
 /* You will define this macro in PA4 */
-//#define HAS_DEVICE
+#define HAS_DEVICE
 
-#define DEBUG
+//volatile static int dummy=0;
+
+//#define DEBUG
 #define LOG_FILE
 
 #include "debug.h"
@@ -15,8 +17,6 @@
 #include <stdint.h>
 #include <assert.h>
 #include <string.h>
-#include "../../lib-common/x86-inc/cpu.h"
-#include "../../lib-common/x86-inc/mmu.h"
 
 typedef uint8_t bool;
 typedef uint32_t hwaddr_t;
